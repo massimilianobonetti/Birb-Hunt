@@ -651,7 +651,7 @@ function createNodes() {
  * @param shaderType type of the shaders of the node
  * @returns the created node
  */
-function createNode(node, position, name, shaderType) {
+function setNode(node, position, name, shaderType) {
 	node.setName(name);
 	node.setShadersType(shaderType);
 	node.setParent(rootNode);
@@ -669,7 +669,7 @@ function createNode(node, position, name, shaderType) {
  * @param position position of the node
  */
 function createSpruceNode(position) {
-	createNode(new SpruceNodeC(), position, "spruce", ShadersType.pbr);
+	setNode(new SpruceNodeC(), position, "spruce", ShadersType.pbr);
 }
 
 /**
@@ -677,7 +677,7 @@ function createSpruceNode(position) {
  * @param position position of the node
  */
 function createDeadTreeNode(position) {
-	createNode(new DeadTreeNodeC(), position, "deadTree", ShadersType.pbr);
+	setNode(new DeadTreeNodeC(), position, "deadTree", ShadersType.pbr);
 }
 
 /**
@@ -685,7 +685,7 @@ function createDeadTreeNode(position) {
  * @param position position of the node
  */
 function createCircularSpruceNode(position) {
-	createNode(new CircularSpruceNodeC(), position, "circularSpruce", ShadersType.phong);
+	setNode(new CircularSpruceNodeC(), position, "circularSpruce", ShadersType.phong);
 }
 
 /**
@@ -693,7 +693,7 @@ function createCircularSpruceNode(position) {
  * @param position position of the node
  */
 function createMaritimePineNode(position) {
-	createNode(new MaritimePineNodeC(), position, "maritimePine", ShadersType.blinn);
+	setNode(new MaritimePineNodeC(), position, "maritimePine", ShadersType.blinn);
 }
 
 /**
@@ -701,7 +701,7 @@ function createMaritimePineNode(position) {
  * @param position position of the node
  */
 function createStumpNode(position) {
-	createNode(new StumpNodeC(), position, "stump", ShadersType.orenNayar);
+	setNode(new StumpNodeC(), position, "stump", ShadersType.orenNayar);
 }
 
 /**
@@ -709,7 +709,7 @@ function createStumpNode(position) {
  * @param position position of the node
  */
 function createFlowerNode(position) {
-	createNode(new FlowerNodeC(), position, "flower", ShadersType.pbr);
+	setNode(new FlowerNodeC(), position, "flower", ShadersType.pbr);
 }
 
 /**
@@ -717,7 +717,7 @@ function createFlowerNode(position) {
  * @param position position of the node
  */
 function createPlantNode(position) {
-	createNode(new PlantNodeC(), position, "plant", ShadersType.pbr);
+	setNode(new PlantNodeC(), position, "plant", ShadersType.pbr);
 }
 
 /**
@@ -725,7 +725,7 @@ function createPlantNode(position) {
  * @param position position of the node
  */
 function createRock1(position) {
-	createNode(new Rock1NodeC(), position, "rock1", ShadersType.pbr);
+	setNode(new Rock1NodeC(), position, "rock1", ShadersType.pbr);
 }
 
 /**
@@ -733,7 +733,7 @@ function createRock1(position) {
  * @param position position of the node
  */
 function createRock2(position) {
-	createNode(new Rock2NodeC(), position, "rock2", ShadersType.pbr);
+	setNode(new Rock2NodeC(), position, "rock2", ShadersType.pbr);
 }
 
 /**
@@ -741,7 +741,7 @@ function createRock2(position) {
  * @param position position of the node
  */
 function createRock3(position) {
-	createNode(new Rock3NodeC(), position, "rock3", ShadersType.pbr);
+	setNode(new Rock3NodeC(), position, "rock3", ShadersType.pbr);
 }
 
 /**
@@ -749,7 +749,7 @@ function createRock3(position) {
  * @param position position of the node
  */
 function createSmallrock(position) {
-	createNode(new SmallrockNodeC(), position, "smallrock", ShadersType.pbr);
+	setNode(new SmallrockNodeC(), position, "smallrock", ShadersType.pbr);
 }
 
 /**
@@ -758,9 +758,9 @@ function createSmallrock(position) {
  * @param scaling scaling of the node
  */
 function createRock3Scaled(position, scaling) {
-	const node = new Rock3ScaledNodeC();
+	const node = new Rock3NodeC();
 	node.setScaling(scaling);
-	createNode(node, position, "rock3scaled", ShadersType.pbr);
+	setNode(node, position, "rock3scaled", ShadersType.pbr);
 }
 
 /**
@@ -768,7 +768,7 @@ function createRock3Scaled(position, scaling) {
  * @param position position of the node
  */
 function createSign(position) {
-	createNode(new SignNodeC(), position, "sign", ShadersType.pbr);
+	setNode(new SignNodeC(), position, "sign", ShadersType.pbr);
 }
 
 /**
@@ -776,7 +776,7 @@ function createSign(position) {
  * @param position position of the node
  */
 function createBladesObject(position) {
-	const node = createNode(new BladesNodeC(), position, "blades", ShadersType.pbr);
+	const node = setNode(new BladesNodeC(), position, "blades", ShadersType.pbr);
 	objectsThatHurts.push(node);
 }
 

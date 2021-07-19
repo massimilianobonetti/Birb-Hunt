@@ -4606,10 +4606,14 @@ class Rock3NodeC extends NodeC {
 	 * All these setting are done only if the corresponding variables were not set up before.
 	 */
 	async createObject() {
-		const collision = new ParallelepipedCollision(this._position, 6.92/2, 5.2, 5.33/2);
+		const collision = new ParallelepipedCollision(this._position, 6.92/2*this._scaling[0], 5.2*this._scaling[1], 5.33/2*this._scaling[2]);
 		this.setCollisionOject(collision);
-	
-		await Rock3NodeC.loadNodeFromObjFile("rock3.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), 
+
+		const tMatrix = utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]);
+		const sMatrix = utils.MakeNUScaleMatrix(this._scaling[0], this._scaling[1], this._scaling[2]);
+
+		const localMatrix = utils.multiplyMatrices(tMatrix, sMatrix);
+		await Rock3NodeC.loadNodeFromObjFile("rock3.obj", this, localMatrix,
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
 	}
 
@@ -4663,220 +4667,6 @@ class Rock3NodeC extends NodeC {
 	setProgram(program) {
 		if(Rock3NodeC._program==null)
 			Rock3NodeC._program = program;
-	}
-
-}
-
-/**
- * This class represents a rock (rock3 in the obj file) in the scene graph, scaled according
- * to the parameters. It extends the class
- * NodeC. All dead tree nodes will have the same static attributes (for example
- * vertices, program, texture and Drawing object).
- */
-class Rock3ScaledNodeC extends NodeC {
-	/**
-	 * Vertices of the object.
-	 * @private
-	 */
-	static _vertices=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
-	 * @type {Drawing}
-	 */
-	static _drawing = new Drawing();
-
-
-	/**
-	 * Constructor of Rock3ScaledNodeC. It creates an object with the default values as attributes.
-	 */
-	constructor() {
-		super();
-	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return Rock3ScaledNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		Rock3ScaledNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return Rock3ScaledNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		Rock3ScaledNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return Rock3ScaledNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		Rock3ScaledNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return Rock3ScaledNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		Rock3ScaledNodeC._alphaTexture = alphaTexture;
-	}
-
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return Rock3ScaledNodeC._program != null;
-	}
-
-	/**
-	 * It sets up the attributes of this object.
-	 * In particular it sets up the collision object.
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 */
-	async createObject() {
-		const collision = new ParallelepipedCollision(this._position, 6.92/2*this._scaling[0], 5.2*this._scaling[1], 5.33/2*this._scaling[2]);
-		this.setCollisionOject(collision);
-
-		const tMatrix = utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]);
-		const sMatrix = utils.MakeNUScaleMatrix(this._scaling[0], this._scaling[1], this._scaling[2]);
-
-		const localMatrix = utils.multiplyMatrices(tMatrix, sMatrix);
-	
-		await Rock3ScaledNodeC.loadNodeFromObjFile("rock3.obj", this, localMatrix,
-		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
-	}
-
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(Rock3ScaledNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			Rock3ScaledNodeC._vertices = objModel.vertices;
-			Rock3ScaledNodeC._normals = objModel.vertexNormals;
-			Rock3ScaledNodeC._indices = objModel.indices;
-			Rock3ScaledNodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, Rock3ScaledNodeC._vertices, Rock3ScaledNodeC._uv, Rock3ScaledNodeC._normals, Rock3ScaledNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return Rock3ScaledNodeC._program;
-	}
-
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(Rock3ScaledNodeC._program==null)
-			Rock3ScaledNodeC._program = program;
 	}
 
 }
@@ -5521,7 +5311,7 @@ class BladesNodeC extends NodeC {
 function classT(node) {
 	const classes = [BirdNodeC, BladesNodeC, CircularSpruceNodeC, DeadTreeNodeC, Drawing, FlowerNodeC,
 		GenericNodeC, MaritimePineNodeC, PlantNodeC, Rock1NodeC, Rock2NodeC, Rock3NodeC,
-		Rock3ScaledNodeC, SignNodeC, SmallrockNodeC, SpruceNodeC, StumpNodeC];
+		SignNodeC, SmallrockNodeC, SpruceNodeC, StumpNodeC];
 
 	return searchClass(node, classes, 0, classes.length-1);
 }
