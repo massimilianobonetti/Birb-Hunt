@@ -333,16 +333,10 @@ class ObjData {
 }
 
 /**
- * This class represents a node/object in the scene graph. It contains the methods that
- * a node must have.
+ * Type of node with base features. It contains only the necessary data and methods to be used to be a node
+ * of the scene graph.
  */
-class NodeC {
-	/**
-	 * Position of the object
-	 * @type {number[]}
-	 * @private
-	 */
-	_position = [0, 0, 0];
+class BaseNodeC {
 	/**
 	 * Local matrix
 	 */
@@ -351,18 +345,6 @@ class NodeC {
 	 * World matrix
 	 */
 	_worldMatrix = utils.identityMatrix();
-	/**
-	 * Scaling
-	 * @type {number[]}
-	 * @private
-	 */
-	_scaling = [1.0, 1.0, 1.0];
-	/**
-	 * Collision object
-	 * @type {Collision}
-	 * @private
-	 */
-	_collisionObject = null;
 	/**
 	 * Child nodes in the scene graph
 	 * @type {NodeC[]}
@@ -377,29 +359,9 @@ class NodeC {
 	_parent = null;
 
 	/**
-	 * Constructor of NodeC. It creates an object with the default values as attributes
+	 * Constructor of BaseNodeC. It creates an object with the default values as attributes
 	 */
 	constructor() {
-	}
-
-	/**
-	 * It returns the position of this object
-	 * @returns {number[]} position of this object
-	 */
-	getPosition() {
-		return this._position;
-	}
-
-
-	/**
-	 * It sets the position of this object with the given one. It sets also the position of the collisionObject if the
-	 * collisionObject is not null.
-	 * @param position new position
-	 */
-	setPosition(position) {
-		this._position = otherUtils.copyArray(position);
-		if(this._collisionObject!=null)
-			this._collisionObject.setPosition(position);
 	}
 
 	/**
@@ -432,6 +394,100 @@ class NodeC {
 	 */
 	setWorldMatrix(worldMatrix) {
 		this._worldMatrix = otherUtils.copyMatrix(worldMatrix);
+	}
+
+	/**
+	 * It sets as parent the given node and it removes this object as child from the old parent
+	 * and it adds this object as child to the new parent
+	 * @param parent new parent of this node
+	 */
+	setParent(parent) {
+		// remove us from our parent
+		if (this._parent) {
+			var ndx = this._parent._children.indexOf(this);
+			if (ndx >= 0) {
+				this._parent._children.splice(ndx, 1);
+			}
+		}
+
+		// Add us to our new parent
+		if (parent) {
+			parent._children.push(this);
+		}
+		this._parent = parent;
+	}
+
+	/**
+	 * It updates the world matrix of this object considering its local matrix and the given
+	 * world matrix of the parent. Then it updates the world matrix of the children
+	 * @param matrix world matrix of the parent
+	 */
+	updateWorldMatrix(matrix) {
+		if (matrix) {
+			// a matrix was passed in so do the math
+			this._worldMatrix = utils.multiplyMatrices(matrix, this._localMatrix);
+		} else {
+			// no matrix was passed in so just copy.
+			this._worldMatrix = otherUtils.copyMatrix(this._localMatrix);
+		}
+
+		// now process all the children
+		var worldMatrix = this._worldMatrix;
+		this._children.forEach(function(child) {
+			child.updateWorldMatrix(worldMatrix);
+		});
+	}
+}
+
+/**
+ * This class represents a node/object in the scene graph, completed with the position, scaling and collision object.
+ */
+class NodeC extends BaseNodeC {
+	/**
+	 * Position of the object
+	 * @type {number[]}
+	 * @private
+	 */
+	_position = [0, 0, 0];
+	/**
+	 * Scaling
+	 * @type {number[]}
+	 * @private
+	 */
+	_scaling = [1.0, 1.0, 1.0];
+	/**
+	 * Collision object
+	 * @type {Collision}
+	 * @private
+	 */
+	_collisionObject = null;
+
+
+	/**
+	 * Constructor of NodeC. It creates an object with the default values as attributes
+	 */
+	constructor() {
+		super();
+	}
+
+	/**
+	 * It returns the position of this object
+	 * @returns {number[]} position of this object
+	 */
+	getPosition() {
+		return this._position;
+	}
+
+
+	/**
+	 * It sets the position of this object with the given one. It sets also the position of the collisionObject if the
+	 * collisionObject is not null.
+	 * @param position new position
+	 */
+	setPosition(position) {
+		this._position = otherUtils.copyArray(position);
+		if(this._collisionObject!=null)
+			this._collisionObject.setPosition(position);
 	}
 
 	/**
@@ -1261,48 +1317,6 @@ class NodeC {
 	}
 
 	/**
-	 * It sets as parent the given node and it removes this object as child from the old parent
-	 * and it adds this object as child to the new parent
-	 * @param parent new parent of this node
-	 */
-	setParent(parent) {
-		// remove us from our parent
-		if (this._parent) {
-		  var ndx = this._parent._children.indexOf(this);
-		  if (ndx >= 0) {
-			  this._parent._children.splice(ndx, 1);
-		  }
-		}
-	  
-		// Add us to our new parent
-		if (parent) {
-		  parent._children.push(this);
-		}
-		this._parent = parent;
-	}
-
-	/**
-	 * It updates the world matrix of this object considering its local matrix and the given
-	 * world matrix of the parent. Then it updates the world matrix of the children
-	 * @param matrix world matrix of the parent
-	 */
-	updateWorldMatrix(matrix) {
-		if (matrix) {
-		  // a matrix was passed in so do the math
-			this._worldMatrix = utils.multiplyMatrices(matrix, this._localMatrix);
-		} else {
-		  // no matrix was passed in so just copy.
-			this._worldMatrix = otherUtils.copyMatrix(this._localMatrix);
-		}
-	  
-		// now process all the children
-		var worldMatrix = this._worldMatrix;
-		this._children.forEach(function(child) {
-		  child.updateWorldMatrix(worldMatrix);
-		});
-	}
-
-	/**
 	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
 	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
 	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
@@ -1621,26 +1635,6 @@ class NodeC {
  */
 class GenericNodeC extends NodeC {
 	/**
-	 * Albedo texture.
-	 * @private
-	 */
-	_albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	_normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	_muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	_alphaTexture = null;
-	/**
 	 * Drawing object.
 	 * @type {Drawing}
 	 */
@@ -1658,7 +1652,7 @@ class GenericNodeC extends NodeC {
 	 * @returns normal vectors
 	 */
 	getAlbedoTexture() {
-		return this._albedoTexture;
+		return this._drawing._albedoTexture;
 	}
 
 	/**
@@ -1666,7 +1660,7 @@ class GenericNodeC extends NodeC {
 	 * @param albedoTexture new albedoTexture
 	 */
 	setAlbedoTexture(albedoTexture) {
-		this._albedoTexture = albedoTexture;
+		this._drawing._albedoTexture = albedoTexture;
 	}
 
 	/**
@@ -1674,7 +1668,7 @@ class GenericNodeC extends NodeC {
 	 * @returns texture for the normal vectors
 	 */
 	getNormalTexture() {
-		return this._normalTexture;
+		return this._drawing._normalTexture;
 	}
 
 	/**
@@ -1682,7 +1676,7 @@ class GenericNodeC extends NodeC {
 	 * @param normalTexture new normalTexture
 	 */
 	setNormalTexture(normalTexture) {
-		this._normalTexture = normalTexture;
+		this._drawing._normalTexture = normalTexture;
 	}
 
 	/**
@@ -1690,7 +1684,7 @@ class GenericNodeC extends NodeC {
 	 * @returns texture for the metalness
 	 */
 	getMuTexture() {
-		return this._muTexture;
+		return this._drawing._muTexture;
 	}
 
 	/**
@@ -1698,7 +1692,7 @@ class GenericNodeC extends NodeC {
 	 * @param muTexture new muTexture
 	 */
 	setMuTexture(muTexture) {
-		this._muTexture = muTexture;
+		this._drawing._muTexture = muTexture;
 	}
 
 	/**
@@ -1706,7 +1700,7 @@ class GenericNodeC extends NodeC {
 	 * @returns texture for the roughness
 	 */
 	getAlphaTexture() {
-		return this._alphaTexture;
+		return this._drawing._alphaTexture;
 	}
 
 	/**
@@ -1714,7 +1708,7 @@ class GenericNodeC extends NodeC {
 	 * @param alphaTexture new alphaTexture
 	 */
 	setAlphaTexture(alphaTexture) {
-		this._alphaTexture = alphaTexture;
+		this._drawing._alphaTexture = alphaTexture;
 	}
 
 
@@ -1757,7 +1751,7 @@ class GenericNodeC extends NodeC {
 	 * @returns wvpMatrixLocation
 	 */
 	getWvpMatrixLocation() {
-		return this._drawing._wvpMatrixLocation;
+		return this.getShadersType()._wvpMatrixLocation;
 	}
 
 
@@ -1766,7 +1760,7 @@ class GenericNodeC extends NodeC {
 	 * @param wvpMatrixLocation new wvpMatrix' location
 	 */
 	setWvpMatrixLocation(wvpMatrixLocation) {
-		this._drawing._wvpMatrixLocation = wvpMatrixLocation;
+		this.getShadersType()._wvpMatrixLocation = wvpMatrixLocation;
 	}
 
 	/**
@@ -1774,7 +1768,7 @@ class GenericNodeC extends NodeC {
 	 * @returns normalMatrixLocation
 	 */
 	getNormalMatrixLocation() {
-		return this._drawing._normalMatrixLocation;
+		return this.getShadersType()._normalMatrixLocation;
 	}
 
 	/**
@@ -1782,7 +1776,7 @@ class GenericNodeC extends NodeC {
 	 * @param normalMatrixLocation new normalMatrixLocation
 	 */
 	setNormalMatrixLocation(normalMatrixLocation) {
-		this._drawing._normalMatrixLocation = normalMatrixLocation;
+		this.getShadersType()._normalMatrixLocation = normalMatrixLocation;
 	}
 
 	/**
@@ -1790,7 +1784,7 @@ class GenericNodeC extends NodeC {
 	 * @returns mDiffColorLoc
 	 */
 	getMDiffColorLoc() {
-		return this._drawing._mDiffColorLoc;
+		return this.getShadersType()._mDiffColorLoc;
 	}
 
 	/**
@@ -1798,7 +1792,7 @@ class GenericNodeC extends NodeC {
 	 * @param mDiffColorLoc new location of the mDiff uniform
 	 */
 	setMDiffColorLoc(mDiffColorLoc) {
-		this._drawing._mDiffColorLoc = mDiffColorLoc;
+		this.getShadersType()._mDiffColorLoc = mDiffColorLoc;
 	}
 
 	/**
@@ -1806,7 +1800,7 @@ class GenericNodeC extends NodeC {
 	 * @returns lightDirectionLoc
 	 */
 	getLightDirectionLoc() {
-		return this._drawing._lightDirectionLoc;
+		return this.getShadersType()._lightDirectionLoc;
 	}
 
 	/**
@@ -1814,7 +1808,7 @@ class GenericNodeC extends NodeC {
 	 * @param lightDirectionLoc new lightDirection's location
 	 */
 	setLightDirectionLoc(lightDirectionLoc) {
-		this._drawing._lightDirectionLoc = lightDirectionLoc;
+		this.getShadersType()._lightDirectionLoc = lightDirectionLoc;
 	}
 
 	/**
@@ -1822,7 +1816,7 @@ class GenericNodeC extends NodeC {
 	 * @returns lightColorLoc
 	 */
 	getLightColorLoc() {
-		return this._drawing._lightColorLoc;
+		return this.getShadersType()._lightColorLoc;
 	}
 
 	/**
@@ -1830,7 +1824,7 @@ class GenericNodeC extends NodeC {
 	 * @param lightColorLoc new lightColorLoc
 	 */
 	setLightColorLoc(lightColorLoc) {
-		this._drawing._lightColorLoc = lightColorLoc;
+		this.getShadersType()._lightColorLoc = lightColorLoc;
 	}
 
 	/**
@@ -1838,7 +1832,7 @@ class GenericNodeC extends NodeC {
 	 * @returns wvMatrixLocation
 	 */
 	getWvMatrixLocation() {
-		return this._drawing._wvMatrixLocation;
+		return this.getShadersType()._wvMatrixLocation;
 	}
 
 	/**
@@ -1846,7 +1840,7 @@ class GenericNodeC extends NodeC {
 	 * @param wvMatrixLocation new wvMatrixLocation
 	 */
 	setWvMatrixLocation(wvMatrixLocation) {
-		this._drawing._wvMatrixLocation = wvMatrixLocation;
+		this.getShadersType()._wvMatrixLocation = wvMatrixLocation;
 	}
 
 	/**
@@ -1854,7 +1848,7 @@ class GenericNodeC extends NodeC {
 	 * @returns muLocation
 	 */
 	getMuLocation() {
-		return this._drawing._muLocation;
+		return this.getShadersType()._muLocation;
 	}
 
 	/**
@@ -1862,7 +1856,7 @@ class GenericNodeC extends NodeC {
 	 * @param muLocation new muLocation
 	 */
 	setMuLocation(muLocation) {
-		this._drawing._muLocation = muLocation;
+		this.getShadersType()._muLocation = muLocation;
 	}
 
 	/**
@@ -1870,7 +1864,7 @@ class GenericNodeC extends NodeC {
 	 * @returns alphaLocation
 	 */
 	getAlphaLocation() {
-		return this._drawing._alphaLocation;
+		return this.getShadersType()._alphaLocation;
 	}
 
 	/**
@@ -1878,7 +1872,7 @@ class GenericNodeC extends NodeC {
 	 * @param alphaLocation new alphaLocation
 	 */
 	setAlphaLocation(alphaLocation) {
-		this._drawing._alphaLocation = alphaLocation;
+		this.getShadersType()._alphaLocation = alphaLocation;
 	}
 
 	/**
@@ -1886,7 +1880,7 @@ class GenericNodeC extends NodeC {
 	 * @returns invViewProjMatrixLoc
 	 */
 	getInvViewProjMatrixLoc() {
-		return this._drawing._invViewProjMatrixLoc;
+		return this.getShadersType()._invViewProjMatrixLoc;
 	}
 
 	/**
@@ -1894,7 +1888,7 @@ class GenericNodeC extends NodeC {
 	 * @param invViewProjMatrixLoc new invViewProjMatrixLoc
 	 */
 	setInvViewProjMatrixLoc(invViewProjMatrixLoc) {
-		this._drawing._invViewProjMatrixLoc = invViewProjMatrixLoc;
+		this.getShadersType()._invViewProjMatrixLoc = invViewProjMatrixLoc;
 	}
 
 	/**
@@ -1902,7 +1896,7 @@ class GenericNodeC extends NodeC {
 	 * @returns albedoTextureLoc
 	 */
 	getAlbedoTextureLoc() {
-		return this._drawing._albedoTextureLoc;
+		return this.getShadersType()._albedoTextureLoc;
 	}
 
 	/**
@@ -1910,7 +1904,7 @@ class GenericNodeC extends NodeC {
 	 * @param albedoTextureLoc new albedoTextureLoc
 	 */
 	setAlbedoTextureLoc(albedoTextureLoc) {
-		this._drawing._albedoTextureLoc = albedoTextureLoc;
+		this.getShadersType()._albedoTextureLoc = albedoTextureLoc;
 	}
 
 	/**
@@ -1918,7 +1912,7 @@ class GenericNodeC extends NodeC {
 	 * @returns normalTextureLoc
 	 */
 	getNormalTextureLoc() {
-		return this._drawing._normalTextureLoc;
+		return this.getShadersType()._normalTextureLoc;
 	}
 
 	/**
@@ -1926,7 +1920,7 @@ class GenericNodeC extends NodeC {
 	 * @param normalTextureLoc new normalTextureLoc
 	 */
 	setNormalTextureLoc(normalTextureLoc) {
-		this._drawing._normalTextureLoc = normalTextureLoc;
+		this.getShadersType()._normalTextureLoc = normalTextureLoc;
 	}
 
 	/**
@@ -1934,7 +1928,7 @@ class GenericNodeC extends NodeC {
 	 * @returns muTextureLoc
 	 */
 	getMuTextureLoc() {
-		return this._drawing._muTextureLoc;
+		return this.getShadersType()._muTextureLoc;
 	}
 
 	/**
@@ -1942,7 +1936,7 @@ class GenericNodeC extends NodeC {
 	 * @param muTextureLoc new muTextureLoc
 	 */
 	setMuTextureLoc(muTextureLoc) {
-		this._drawing._muTextureLoc = muTextureLoc;
+		this.getShadersType()._muTextureLoc = muTextureLoc;
 	}
 
 	/**
@@ -1950,7 +1944,7 @@ class GenericNodeC extends NodeC {
 	 * @returns alphaTextureLoc
 	 */
 	getAlphaTextureLoc() {
-		return this._drawing._alphaTextureLoc;
+		return this.getShadersType()._alphaTextureLoc;
 	}
 
 	/**
@@ -1958,7 +1952,7 @@ class GenericNodeC extends NodeC {
 	 * @param alphaTextureLoc new alphaTextureLoc
 	 */
 	setAlphaTextureLoc(alphaTextureLoc) {
-		this._drawing._alphaTextureLoc = alphaTextureLoc;
+		this.getShadersType()._alphaTextureLoc = alphaTextureLoc;
 	}
 
 	/**
@@ -1966,7 +1960,7 @@ class GenericNodeC extends NodeC {
 	 * @returns hemiLightUpperLoc
 	 */
 	getHemiLightUpperLoc() {
-		return this._drawing._hemiLightUpperLoc;
+		return this.getShadersType()._hemiLightUpperLoc;
 	}
 
 	/**
@@ -1974,7 +1968,7 @@ class GenericNodeC extends NodeC {
 	 * @param hemiLightUpperLoc new hemiLightUpperLoc
 	 */
 	setHemiLightUpperLoc(hemiLightUpperLoc) {
-		this._drawing._hemiLightUpperLoc = hemiLightUpperLoc;
+		this.getShadersType()._hemiLightUpperLoc = hemiLightUpperLoc;
 	}
 
 	/**
@@ -1982,7 +1976,7 @@ class GenericNodeC extends NodeC {
 	 * @returns hemiLightLowerLoc
 	 */
 	getHemiLightLowerLoc() {
-		return this._drawing._hemiLightLowerLoc;
+		return this.getShadersType()._hemiLightLowerLoc;
 	}
 
 	/**
@@ -1990,7 +1984,7 @@ class GenericNodeC extends NodeC {
 	 * @param hemiLightLowerLoc new hemiLightLowerLoc
 	 */
 	setHemiLightLowerLoc(hemiLightLowerLoc) {
-		this._drawing._hemiLightLowerLoc = hemiLightLowerLoc;
+		this.getShadersType()._hemiLightLowerLoc = hemiLightLowerLoc;
 	}
 
 	/**
@@ -1998,7 +1992,7 @@ class GenericNodeC extends NodeC {
 	 * @returns hemisphericDLoc
 	 */
 	getHemisphericDLoc() {
-		return this._drawing._hemisphericDLoc;
+		return this.getShadersType()._hemisphericDLoc;
 	}
 
 	/**
@@ -2006,7 +2000,7 @@ class GenericNodeC extends NodeC {
 	 * @param hemisphericDLoc new hemisphericDLoc
 	 */
 	setHemisphericDLoc(hemisphericDLoc) {
-		this._drawing._hemisphericDLoc = hemisphericDLoc;
+		this.getShadersType()._hemisphericDLoc = hemisphericDLoc;
 	}
 
 	/**
@@ -2014,7 +2008,7 @@ class GenericNodeC extends NodeC {
 	 * @returns muPersonalLoc
 	 */
 	getMuPersonalLoc() {
-		return this._drawing._muPersonalLoc;
+		return this.getShadersType()._muPersonalLoc;
 	}
 
 	/**
@@ -2022,7 +2016,7 @@ class GenericNodeC extends NodeC {
 	 * @param muPersonalLoc new muPersonalLoc
 	 */
 	setMuPersonalLoc(muPersonalLoc) {
-		this._drawing._muPersonalLoc = muPersonalLoc;
+		this.getShadersType()._muPersonalLoc = muPersonalLoc;
 	}
 
 	/**
@@ -2030,7 +2024,7 @@ class GenericNodeC extends NodeC {
 	 * @returns alphaPersonalLoc
 	 */
 	getAlphaPersonalLoc() {
-		return this._drawing._alphaPersonalLoc;
+		return this.getShadersType()._alphaPersonalLoc;
 	}
 
 	/**
@@ -2038,7 +2032,7 @@ class GenericNodeC extends NodeC {
 	 * @param alphaPersonalLoc new alphaPersonalLoc
 	 */
 	setAlphaPersonalLoc(alphaPersonalLoc) {
-		this._drawing._alphaPersonalLoc = alphaPersonalLoc;
+		this.getShadersType()._alphaPersonalLoc = alphaPersonalLoc;
 	}
 
 	/**
@@ -2046,7 +2040,7 @@ class GenericNodeC extends NodeC {
 	 * @returns f0PersonalLoc
 	 */
 	getF0PersonalLoc() {
-		return this._drawing._f0PersonalLoc;
+		return this.getShadersType()._f0PersonalLoc;
 	}
 
 	/**
@@ -2054,7 +2048,7 @@ class GenericNodeC extends NodeC {
 	 * @param f0PersonalLoc new f0PersonalLoc
 	 */
 	setF0PersonalLoc(f0PersonalLoc) {
-		this._drawing._f0PersonalLoc = f0PersonalLoc;
+		this.getShadersType()._f0PersonalLoc = f0PersonalLoc;
 	}
 
 	/**
@@ -2110,7 +2104,7 @@ class GenericNodeC extends NodeC {
 	 * @returns useTexturesForMuAlphaLoc
 	 */
 	getUseTexturesForMuAlphaLoc() {
-		return this._drawing._useTexturesForMuAlphaLoc;
+		return this.getShadersType()._useTexturesForMuAlphaLoc;
 	}
 
 	/**
@@ -2118,7 +2112,7 @@ class GenericNodeC extends NodeC {
 	 * @param useTexturesForMuAlphaLoc new useTexturesForMuAlphaLoc
 	 */
 	setUseTexturesForMuAlphaLoc(useTexturesForMuAlphaLoc) {
-		this._drawing._useTexturesForMuAlphaLoc = useTexturesForMuAlphaLoc;
+		this.getShadersType()._useTexturesForMuAlphaLoc = useTexturesForMuAlphaLoc;
 	}
 
 	/**
@@ -2142,7 +2136,7 @@ class GenericNodeC extends NodeC {
 	 * @returns useClassicF0FormulaLoc
 	 */
 	getUseClassicF0FormulaLoc() {
-		return this._drawing._useClassicF0FormulaLoc;
+		return this.getShadersType()._useClassicF0FormulaLoc;
 	}
 
 	/**
@@ -2150,7 +2144,7 @@ class GenericNodeC extends NodeC {
 	 * @param useClassicF0FormulaLoc new useClassicF0FormulaLoc
 	 */
 	setUseClassicF0FormulaLoc(useClassicF0FormulaLoc) {
-		this._drawing._useClassicF0FormulaLoc = useClassicF0FormulaLoc;
+		this.getShadersType()._useClassicF0FormulaLoc = useClassicF0FormulaLoc;
 	}
 
 	/**
@@ -2190,7 +2184,7 @@ class GenericNodeC extends NodeC {
 	 * @returns useNormalTextureLoc
 	 */
 	getUseNormalTextureLoc() {
-		return this._drawing._useNormalTextureLoc;
+		return this.getShadersType()._useNormalTextureLoc;
 	}
 
 	/**
@@ -2198,7 +2192,7 @@ class GenericNodeC extends NodeC {
 	 * @param useNormalTextureLoc new useNormalTextureLoc
 	 */
 	setUseNormalTextureLoc(useNormalTextureLoc) {
-		this._drawing._useNormalTextureLoc = useNormalTextureLoc;
+		this.getShadersType()._useNormalTextureLoc = useNormalTextureLoc;
 	}
 
 	/**
@@ -2206,7 +2200,7 @@ class GenericNodeC extends NodeC {
 	 * @returns pl1ColorLoc
 	 */
 	getPl1ColorLoc() {
-		return this._drawing._pl1ColorLoc;
+		return this.getShadersType()._pl1ColorLoc;
 	}
 
 	/**
@@ -2214,7 +2208,7 @@ class GenericNodeC extends NodeC {
 	 * @param pl1ColorLoc new pl1ColorLoc
 	 */
 	setPl1ColorLoc(pl1ColorLoc) {
-		this._drawing._pl1ColorLoc = pl1ColorLoc;
+		this.getShadersType()._pl1ColorLoc = pl1ColorLoc;
 	}
 
 	/**
@@ -2222,7 +2216,7 @@ class GenericNodeC extends NodeC {
 	 * @returns pl1PosLoc
 	 */
 	getPl1PosLoc() {
-		return this._drawing._pl1PosLoc;
+		return this.getShadersType()._pl1PosLoc;
 	}
 
 	/**
@@ -2230,7 +2224,7 @@ class GenericNodeC extends NodeC {
 	 * @param pl1PosLoc new pl1PosLoc
 	 */
 	setPl1PosLoc(pl1PosLoc) {
-		this._drawing._pl1PosLoc = pl1PosLoc;
+		this.getShadersType()._pl1PosLoc = pl1PosLoc;
 	}
 
 	/**
@@ -2238,7 +2232,7 @@ class GenericNodeC extends NodeC {
 	 * @returns pl2ColorLoc
 	 */
 	getPl2ColorLoc() {
-		return this._drawing._pl2ColorLoc;
+		return this.getShadersType()._pl2ColorLoc;
 	}
 
 	/**
@@ -2246,7 +2240,7 @@ class GenericNodeC extends NodeC {
 	 * @param pl2ColorLoc new pl2ColorLoc
 	 */
 	setPl2ColorLoc(pl2ColorLoc) {
-		this._drawing._pl2ColorLoc = pl2ColorLoc;
+		this.getShadersType()._pl2ColorLoc = pl2ColorLoc;
 	}
 
 	/**
@@ -2254,7 +2248,7 @@ class GenericNodeC extends NodeC {
 	 * @returns pl2PosLoc
 	 */
 	getPl2PosLoc() {
-		return this._drawing._pl2PosLoc;
+		return this.getShadersType()._pl2PosLoc;
 	}
 
 	/**
@@ -2262,7 +2256,7 @@ class GenericNodeC extends NodeC {
 	 * @param pl2PosLoc new pl2PosLoc
 	 */
 	setPl2PosLoc(pl2PosLoc) {
-		this._drawing._pl2PosLoc = pl2PosLoc;
+		this.getShadersType()._pl2PosLoc = pl2PosLoc;
 	}
 
 	/**
@@ -2270,7 +2264,7 @@ class GenericNodeC extends NodeC {
 	 * @returns plTargetLoc
 	 */
 	getPlTargetLoc() {
-		return this._drawing._plTargetLoc;
+		return this.getShadersType()._plTargetLoc;
 	}
 
 	/**
@@ -2278,7 +2272,7 @@ class GenericNodeC extends NodeC {
 	 * @param plTargetLoc new plTargetLoc
 	 */
 	setPlTargetLoc(plTargetLoc) {
-		this._drawing._plTargetLoc = plTargetLoc;
+		this.getShadersType()._plTargetLoc = plTargetLoc;
 	}
 
 	/**
@@ -2286,7 +2280,7 @@ class GenericNodeC extends NodeC {
 	 * @returns plDecayLoc
 	 */
 	getPlDecayLoc() {
-		return this._drawing._plDecayLoc;
+		return this.getShadersType()._plDecayLoc;
 	}
 
 	/**
@@ -2294,7 +2288,7 @@ class GenericNodeC extends NodeC {
 	 * @param plDecayLoc new plDecayLoc
 	 */
 	setPlDecayLoc(plDecayLoc) {
-		this._drawing._plDecayLoc = plDecayLoc;
+		this.getShadersType()._plDecayLoc = plDecayLoc;
 	}
 
 	/**
@@ -2302,7 +2296,7 @@ class GenericNodeC extends NodeC {
 	 * @returns spotlColorLoc
 	 */
 	getSpotlColorLoc() {
-		return this._drawing._spotlColorLoc;
+		return this.getShadersType()._spotlColorLoc;
 	}
 
 	/**
@@ -2310,7 +2304,7 @@ class GenericNodeC extends NodeC {
 	 * @param spotlColorLoc new spotlColorLoc
 	 */
 	setSpotlColorLoc(spotlColorLoc) {
-		this._drawing._spotlColorLoc = spotlColorLoc;
+		this.getShadersType()._spotlColorLoc = spotlColorLoc;
 	}
 
 	/**
@@ -2318,7 +2312,7 @@ class GenericNodeC extends NodeC {
 	 * @returns spotPosLoc
 	 */
 	getSpotPosLoc() {
-		return this._drawing._spotPosLoc;
+		return this.getShadersType()._spotPosLoc;
 	}
 
 	/**
@@ -2326,7 +2320,7 @@ class GenericNodeC extends NodeC {
 	 * @param spotPosLoc new spotPosLoc
 	 */
 	setSpotPosLoc(spotPosLoc) {
-		this._drawing._spotPosLoc = spotPosLoc;
+		this.getShadersType()._spotPosLoc = spotPosLoc;
 	}
 
 	/**
@@ -2334,7 +2328,7 @@ class GenericNodeC extends NodeC {
 	 * @returns spotTargetLoc
 	 */
 	getSpotTargetLoc() {
-		return this._drawing._spotTargetLoc;
+		return this.getShadersType()._spotTargetLoc;
 	}
 
 	/**
@@ -2342,7 +2336,7 @@ class GenericNodeC extends NodeC {
 	 * @param spotTargetLoc new spotTargetLoc
 	 */
 	setSpotTargetLoc(spotTargetLoc) {
-		this._drawing._spotTargetLoc = spotTargetLoc;
+		this.getShadersType()._spotTargetLoc = spotTargetLoc;
 	}
 
 	/**
@@ -2350,7 +2344,7 @@ class GenericNodeC extends NodeC {
 	 * @returns spotDecayLoc
 	 */
 	getSpotDecayLoc() {
-		return this._drawing._spotDecayLoc;
+		return this.getShadersType()._spotDecayLoc;
 	}
 
 	/**
@@ -2358,7 +2352,7 @@ class GenericNodeC extends NodeC {
 	 * @param spotDecayLoc new spotDecayLoc
 	 */
 	setSpotDecayLoc(spotDecayLoc) {
-		this._drawing._spotDecayLoc = spotDecayLoc;
+		this.getShadersType()._spotDecayLoc = spotDecayLoc;
 	}
 
 	/**
@@ -2366,7 +2360,7 @@ class GenericNodeC extends NodeC {
 	 * @returns spotConeInLoc
 	 */
 	getSpotConeInLoc() {
-		return this._drawing._spotConeInLoc;
+		return this.getShadersType()._spotConeInLoc;
 	}
 
 	/**
@@ -2374,7 +2368,7 @@ class GenericNodeC extends NodeC {
 	 * @param spotConeInLoc new spotConeInLoc
 	 */
 	setSpotConeInLoc(spotConeInLoc) {
-		this._drawing._spotConeInLoc = spotConeInLoc;
+		this.getShadersType()._spotConeInLoc = spotConeInLoc;
 	}
 
 	/**
@@ -2382,7 +2376,7 @@ class GenericNodeC extends NodeC {
 	 * @returns spotConeOutLoc
 	 */
 	getSpotConeOutLoc() {
-		return this._drawing._spotConeOutLoc;
+		return this.getShadersType()._spotConeOutLoc;
 	}
 
 	/**
@@ -2390,7 +2384,7 @@ class GenericNodeC extends NodeC {
 	 * @param spotConeOutLoc new spotConeOutLoc
 	 */
 	setSpotConeOutLoc(spotConeOutLoc) {
-		this._drawing._spotConeOutLoc = spotConeOutLoc;
+		this.getShadersType()._spotConeOutLoc = spotConeOutLoc;
 	}
 
 	/**
@@ -2398,7 +2392,7 @@ class GenericNodeC extends NodeC {
 	 * @returns isNightLoc
 	 */
 	getIsNightLoc() {
-		return this._drawing._isNightLoc;
+		return this.getShadersType()._isNightLoc;
 	}
 
 	/**
@@ -2406,7 +2400,7 @@ class GenericNodeC extends NodeC {
 	 * @param isNightLoc new isNightLoc
 	 */
 	setIsNightLoc(isNightLoc) {
-		this._drawing._isNightLoc = isNightLoc;
+		this.getShadersType()._isNightLoc = isNightLoc;
 	}
 
 	/**
@@ -2414,7 +2408,7 @@ class GenericNodeC extends NodeC {
 	 * @returns spotDirectionLoc
 	 */
 	getSpotDirectionLoc() {
-		return this._drawing._spotDirectionLoc;
+		return this.getShadersType()._spotDirectionLoc;
 	}
 
 	/**
@@ -2422,7 +2416,7 @@ class GenericNodeC extends NodeC {
 	 * @param spotDirectionLoc new spotDirectionLoc
 	 */
 	setSpotDirectionLoc(spotDirectionLoc) {
-		this._drawing._spotDirectionLoc = spotDirectionLoc;
+		this.getShadersType()._spotDirectionLoc = spotDirectionLoc;
 	}
 
 	/**

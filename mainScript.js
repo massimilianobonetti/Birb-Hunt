@@ -464,7 +464,7 @@ function setBirdPosition() {
  * It creates the nodes of the scene
  */
 function createNodes() {
-	rootNode = new NodeC();
+	rootNode = new BaseNodeC();
 
 	fieldNode = new GenericNodeC();
 	fieldNode.setShadersType(ShadersType.pbr);
