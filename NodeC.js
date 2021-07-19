@@ -228,7 +228,7 @@ class Locations {
 
 /**
  * It contains the variables that are used as static in the subclasses (except GenericNodeC)
- * of NodeC. For example the vertex array object.
+ * of NodeC and that are used to draw the objects. For example the vertex array object.
  */
 class Drawing {
 	/**
@@ -280,11 +280,56 @@ class Drawing {
 	_shadersType = ShadersType.pbr;
 
 	/**
+	 * Albedo texture of the object.
+	 */
+	_albedoTexture = null;
+	/**
+	 * Texture that contains the encoding of the normal vectors.
+	 */
+	_normalTexture = null;
+	/**
+	 * Texture that contains the encoding of the metalness.
+	 */
+	_muTexture = null;
+	/**
+	 * Texture that contains the encoding of the roughness.
+	 */
+	_alphaTexture = null;
+
+	/**
 	 * Constructor of Drawing. It creates an object with the default values as attributes
 	 */
 	constructor() {
 	}
 
+}
+
+/**
+ * This class contains the data associated to the vertices of the objects: positions, normal vectors,
+ * uv coordinates and indices. They are loaded usually from the obj file.
+ */
+class ObjData {
+	/**
+	 * Vertices of the object.
+	 */
+	_vertices=null;
+	/**
+	 * Normal vectors of the object.
+	 */
+	_normals=null;
+	/**
+	 * Normal vectors of the object.
+	 */
+	_indices=null;
+	/**
+	 * Indices of the object.
+	 */
+	_uv=null;
+	/**
+	 * Constructor of VertexData. It creates an object with the default values as attributes
+	 */
+	constructor() {
+	}
 }
 
 /**
@@ -345,12 +390,16 @@ class NodeC {
 		return this._position;
 	}
 
+
 	/**
-	 * It sets the position with the given one
+	 * It sets the position of this object with the given one. It sets also the position of the collisionObject if the
+	 * collisionObject is not null.
 	 * @param position new position
 	 */
 	setPosition(position) {
 		this._position = otherUtils.copyArray(position);
+		if(this._collisionObject!=null)
+			this._collisionObject.setPosition(position);
 	}
 
 	/**
@@ -417,16 +466,6 @@ class NodeC {
 		this._collisionObject = collisionObject;
 	}
 
-
-
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return null;
-	}
 
 	/**
 	 * It returns the VAO(Vertex Array Object)
@@ -603,67 +642,6 @@ class NodeC {
 	 */
 	setInvViewProjMatrixLoc(invViewProjMatrixLoc) {
 		this.getShadersType().locations._invViewProjMatrixLoc = invViewProjMatrixLoc;
-	}
-
-	/**
-	 * It returns the albedo texture
-	 * @returns normal vectors
-	 */
-	getAlbedoTexture() {
-		return null;
-	}
-
-	/**
-	 * It sets the albedoTexture with the given one
-	 * @param albedoTexture new albedoTexture
-	 */
-	setAlbedoTexture(albedoTexture) {
-	}
-
-	/**
-	 * It returns the texture for the normal vectors
-	 * @returns texture for the normal vectors
-	 */
-	getNormalTexture() {
-		return null;
-	}
-
-	/**
-	 * It sets the normalTexture with the given one
-	 * @param normalTexture new normalTexture
-	 */
-	setNormalTexture(normalTexture) {
-	}
-
-	/**
-	 * It returns the texture for the metalness
-	 * @returns texture for the metalness
-	 */
-	getMuTexture() {
-		return null;
-	}
-
-	/**
-	 * It sets the muTexture with the given one
-	 * @param muTexture new muTexture
-	 */
-	setMuTexture(muTexture) {
-	}
-
-
-	/**
-	 * It returns the texture for the roughness
-	 * @returns texture for the roughness
-	 */
-	getAlphaTexture() {
-		return null;
-	}
-
-	/**
-	 * It sets the alphaTexture with the given one
-	 * @param alphaTexture new alphaTexture
-	 */
-	setAlphaTexture(alphaTexture) {
 	}
 
 	/**
@@ -1211,6 +1189,78 @@ class NodeC {
 	}
 
 	/**
+	 * It returns the shader program.
+	 * @returns shader program
+	 */
+	getProgram() {
+		return this.getShadersType().program;
+	}
+
+	/**
+	 * It returns the albedo texture.
+	 * @returns albedo texture.
+	 */
+	getAlbedoTexture() {
+		return classT(this)._drawing._albedoTexture;
+	}
+
+	/**
+	 * It sets the albedo texture with the given one.
+	 * @param albedoTexture albedo texture.
+	 */
+	setAlbedoTexture(albedoTexture) {
+		classT(this)._drawing._albedoTexture = albedoTexture;
+	}
+
+	/**
+	 * It returns the normal texture.
+	 * @returns normal texture.
+	 */
+	getNormalTexture() {
+		return classT(this)._drawing._normalTexture;
+	}
+
+	/**
+	 * It sets the normal texture with the given one.
+	 * @param normalTexture normal texture.
+	 */
+	setNormalTexture(normalTexture) {
+		classT(this)._drawing._normalTexture = normalTexture;
+	}
+
+	/**
+	 * It returns the metalness texture.
+	 * @returns metalness texture.
+	 */
+	getMuTexture() {
+		return classT(this)._drawing._muTexture;
+	}
+
+	/**
+	 * It sets the metalness texture with the given one.
+	 * @param muTexture metalness texture.
+	 */
+	setMuTexture(muTexture) {
+		classT(this)._drawing._muTexture = muTexture;
+	}
+
+	/**
+	 * It returns the roughness texture.
+	 * @returns roughness texture.
+	 */
+	getAlphaTexture() {
+		return classT(this)._drawing._alphaTexture;
+	}
+
+	/**
+	 * It sets the roughness texture with the given one.
+	 * @param alphaTexture roughness texture.
+	 */
+	setAlphaTexture(alphaTexture) {
+		classT(this)._drawing._alphaTexture = alphaTexture;
+	}
+
+	/**
 	 * It sets as parent the given node and it removes this object as child from the old parent
 	 * and it adds this object as child to the new parent
 	 * @param parent new parent of this node
@@ -1258,21 +1308,37 @@ class NodeC {
 	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
 	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
 	 * All these setting are done only if the corresponding variables were not set up before.
-	 * This method of NodeC is a prototype, it must overridden by the subclasses if it is needed.
-	 * @param objFilename name of the obj file.
-	 * @param node node of which the variables are set.
-	 * @param localMatrix local matrix.
-	 * @param muPersonal personalized metalness.
-	 * @param alphaPersonal personalized roughness.
-	 * @param f0Personal personalized F0.
+	 * @param objFilename name of the obj file
+	 * @param node node of which the variables are set
+	 * @param localMatrix local matrix
+	 * @param muPersonal personalized metalness
+	 * @param alphaPersonal personalized roughness
+	 * @param f0Personal personalized F0
 	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering).
-	 * @param textureName name of the textures.
-	 * @param textureFileExtension extension of the textures.
-	 * @param useNormalTexture whether to use the texture for the normal vectors.
+	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR
+	 * (Physically based rendering)
+	 * @param textureName name of the textures
+	 * @param textureFileExtension extension of the textures
+	 * @param useNormalTexture whether to use the texture for the normal vectors
 	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
+	async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal,
+							  useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension,
+							  useNormalTexture) {
+		const classType = classT(this);
+		if(classType._objData._vertices==null) {
+			const objModel = await NodeC.loadObjFile(objFilename);
 
+			classType._objData._vertices = objModel.vertices;
+			classType._objData._normals = objModel.vertexNormals;
+			classType._objData._indices = objModel.indices;
+			classType._objData._uv= objModel.textures;
+		}
+
+		node.setLocalMatrix(localMatrix);
+
+		await NodeC.createAndloadDataOnGPUForNode(node, classType._objData._vertices, classType._objData._uv,
+			classType._objData._normals, classType._objData._indices, muPersonal, alphaPersonal, f0Personal,
+			useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
 	}
 
 	/**
@@ -1498,7 +1564,6 @@ class NodeC {
 			textureObject._texture = texture;
 			textures.push(textureObject);
 		}
-		console.log(texture);
 		return texture;
 	}
 
@@ -1586,14 +1651,6 @@ class GenericNodeC extends NodeC {
 	 */
 	constructor() {
 		super();
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
 	}
 
 	/**
@@ -2393,47 +2450,12 @@ class GenericNodeC extends NodeC {
  */
 class SpruceNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -2444,71 +2466,6 @@ class SpruceNodeC extends NodeC {
 	constructor() {
 		super();
 	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return SpruceNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		SpruceNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return SpruceNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		SpruceNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return SpruceNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		SpruceNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return SpruceNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		SpruceNodeC._alphaTexture = alphaTexture;
-	}
-
 
 	/**
 	 * It sets up the attributes of this object.
@@ -2523,55 +2480,10 @@ class SpruceNodeC extends NodeC {
 		const collision = new CylinderCollision(this._position, 0.35, 4.38);
 		this.setCollisionOject(collision);
 	
-		await SpruceNodeC.loadNodeFromObjFile("spruceSmooth.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), 
+		await this.loadNodeFromObjFile("spruceSmooth.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
 	}
 
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal,
-									 useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension,
-									 useNormalTexture) {
-		
-		if(SpruceNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			SpruceNodeC._vertices = objModel.vertices;
-			SpruceNodeC._normals = objModel.vertexNormals;
-			SpruceNodeC._indices = objModel.indices;
-			SpruceNodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, SpruceNodeC._vertices, SpruceNodeC._uv, SpruceNodeC._normals,
-			SpruceNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula,
-			textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
-	}
 
 
 }
@@ -2583,47 +2495,12 @@ class SpruceNodeC extends NodeC {
  */
 class DeadTreeNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -2635,69 +2512,7 @@ class DeadTreeNodeC extends NodeC {
 		super();
 	}
 
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return DeadTreeNodeC._albedoTexture;
-	}
 
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		DeadTreeNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return DeadTreeNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		DeadTreeNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return DeadTreeNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		DeadTreeNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return DeadTreeNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		DeadTreeNodeC._alphaTexture = alphaTexture;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -2712,56 +2527,12 @@ class DeadTreeNodeC extends NodeC {
 		const collision = new CylinderCollision(this._position, 0.22, 4.41);
 		this.setCollisionOject(collision);
 	
-		await DeadTreeNodeC.loadNodeFromObjFile("deadTree.obj", this, utils.MakeTranslateMatrix(this._position[0],
+		await this.loadNodeFromObjFile("deadTree.obj", this, utils.MakeTranslateMatrix(this._position[0],
 			this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true,
 			"Texture_01", ".jpg", false);
 	}
 
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal,
-									 useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(DeadTreeNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			DeadTreeNodeC._vertices = objModel.vertices;
-			DeadTreeNodeC._normals = objModel.vertexNormals;
-			DeadTreeNodeC._indices = objModel.indices;
-			DeadTreeNodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, DeadTreeNodeC._vertices, DeadTreeNodeC._uv, DeadTreeNodeC._normals,
-			DeadTreeNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula,
-			textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
-	}
 
 
 }
@@ -2773,47 +2544,12 @@ class DeadTreeNodeC extends NodeC {
  */
 class CircularSpruceNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -2823,70 +2559,6 @@ class CircularSpruceNodeC extends NodeC {
 	 */
 	constructor() {
 		super();
-	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return CircularSpruceNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		CircularSpruceNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return CircularSpruceNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		CircularSpruceNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return CircularSpruceNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		CircularSpruceNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return CircularSpruceNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		CircularSpruceNodeC._alphaTexture = alphaTexture;
 	}
 
 
@@ -2903,50 +2575,8 @@ class CircularSpruceNodeC extends NodeC {
 		const collision = new CylinderCollision(this._position, 0.2, 4.38);
 		this.setCollisionOject(collision);
 	
-		await CircularSpruceNodeC.loadNodeFromObjFile("circularSpruce.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), 
+		await this.loadNodeFromObjFile("circularSpruce.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
-	}
-
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(CircularSpruceNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			CircularSpruceNodeC._vertices = objModel.vertices;
-			CircularSpruceNodeC._normals = objModel.vertexNormals;
-			CircularSpruceNodeC._indices = objModel.indices;
-			CircularSpruceNodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, CircularSpruceNodeC._vertices, CircularSpruceNodeC._uv, CircularSpruceNodeC._normals, CircularSpruceNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
 	}
 
 
@@ -2959,47 +2589,12 @@ class CircularSpruceNodeC extends NodeC {
  */
 class MaritimePineNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -3010,70 +2605,6 @@ class MaritimePineNodeC extends NodeC {
 	 */
 	constructor() {
 		super();
-	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return MaritimePineNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		MaritimePineNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return MaritimePineNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		MaritimePineNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return MaritimePineNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		MaritimePineNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return MaritimePineNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		MaritimePineNodeC._alphaTexture = alphaTexture;
 	}
 
 
@@ -3090,50 +2621,8 @@ class MaritimePineNodeC extends NodeC {
 		const collision = new CylinderCollision(this._position, 0.32, 2);
 		this.setCollisionOject(collision);
 	
-		await MaritimePineNodeC.loadNodeFromObjFile("maritimePine.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), 
+		await this.loadNodeFromObjFile("maritimePine.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
-	}
-
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(MaritimePineNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			MaritimePineNodeC._vertices = objModel.vertices;
-			MaritimePineNodeC._normals = objModel.vertexNormals;
-			MaritimePineNodeC._indices = objModel.indices;
-			MaritimePineNodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, MaritimePineNodeC._vertices, MaritimePineNodeC._uv, MaritimePineNodeC._normals, MaritimePineNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
 	}
 
 
@@ -3146,47 +2635,12 @@ class MaritimePineNodeC extends NodeC {
  */
 class StumpNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -3201,71 +2655,6 @@ class StumpNodeC extends NodeC {
 	}
 
 	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return StumpNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		StumpNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return StumpNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		StumpNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return StumpNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		StumpNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return StumpNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		StumpNodeC._alphaTexture = alphaTexture;
-	}
-
-
-	/**
 	 * It sets up the attributes of this object.
 	 * In particular it sets up the collision object.
 	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
@@ -3278,50 +2667,8 @@ class StumpNodeC extends NodeC {
 		const collision = new CylinderCollision(this._position, 0.7, 0.896);
 		this.setCollisionOject(collision);
 	
-		await StumpNodeC.loadNodeFromObjFile("stump.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), 
+		await this.loadNodeFromObjFile("stump.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
-	}
-
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(StumpNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			StumpNodeC._vertices = objModel.vertices;
-			StumpNodeC._normals = objModel.vertexNormals;
-			StumpNodeC._indices = objModel.indices;
-			StumpNodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, StumpNodeC._vertices, StumpNodeC._uv, StumpNodeC._normals, StumpNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
 	}
 
 }
@@ -3333,47 +2680,12 @@ class StumpNodeC extends NodeC {
  */
 class FlowerNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -3388,71 +2700,6 @@ class FlowerNodeC extends NodeC {
 	}
 
 	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return FlowerNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		FlowerNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return FlowerNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		FlowerNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return FlowerNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		FlowerNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return FlowerNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		FlowerNodeC._alphaTexture = alphaTexture;
-	}
-
-
-	/**
 	 * It sets up the attributes of this object.
 	 * In particular it sets up the collision object.
 	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
@@ -3465,51 +2712,10 @@ class FlowerNodeC extends NodeC {
 		const collision = new NoCollision();
 		this.setCollisionOject(collision);
 	
-		await FlowerNodeC.loadNodeFromObjFile("flower.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), 
+		await this.loadNodeFromObjFile("flower.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
 	}
 
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(FlowerNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			FlowerNodeC._vertices = objModel.vertices;
-			FlowerNodeC._normals = objModel.vertexNormals;
-			FlowerNodeC._indices = objModel.indices;
-			FlowerNodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, FlowerNodeC._vertices, FlowerNodeC._uv, FlowerNodeC._normals, FlowerNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
-	}
 
 }
 
@@ -3520,47 +2726,12 @@ class FlowerNodeC extends NodeC {
  */
 class PlantNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -3574,70 +2745,6 @@ class PlantNodeC extends NodeC {
 		super();
 	}
 
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return PlantNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		PlantNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return PlantNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		PlantNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return PlantNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		PlantNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return PlantNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		PlantNodeC._alphaTexture = alphaTexture;
-	}
-
 
 	/**
 	 * It sets up the attributes of this object.
@@ -3652,50 +2759,8 @@ class PlantNodeC extends NodeC {
 		const collision = new NoCollision();
 		this.setCollisionOject(collision);
 	
-		await PlantNodeC.loadNodeFromObjFile("plant.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), 
+		await this.loadNodeFromObjFile("plant.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
-	}
-
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(PlantNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			PlantNodeC._vertices = objModel.vertices;
-			PlantNodeC._normals = objModel.vertexNormals;
-			PlantNodeC._indices = objModel.indices;
-			PlantNodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, PlantNodeC._vertices, PlantNodeC._uv, PlantNodeC._normals, PlantNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
 	}
 
 
@@ -3708,47 +2773,12 @@ class PlantNodeC extends NodeC {
  */
 class BirdNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -3759,70 +2789,6 @@ class BirdNodeC extends NodeC {
 	 */
 	constructor() {
 		super();
-	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return BirdNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		BirdNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return BirdNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		BirdNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return BirdNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		BirdNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return BirdNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		BirdNodeC._alphaTexture = alphaTexture;
 	}
 
 
@@ -3839,62 +2805,10 @@ class BirdNodeC extends NodeC {
 		const collision = new SphereCollision(this._position, 0.5);
 		this.setCollisionOject(collision);
 
-		await BirdNodeC.loadNodeFromObjFile("bird.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), 
+		await this.loadNodeFromObjFile("bird.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true, "texture_birb", ".png", false);
 	}
 
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(BirdNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			BirdNodeC._vertices = objModel.vertices;
-			BirdNodeC._normals = objModel.vertexNormals;
-			BirdNodeC._indices = objModel.indices;
-			BirdNodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, BirdNodeC._vertices, BirdNodeC._uv, BirdNodeC._normals, BirdNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
-	}
-
-
-	/**
-	 * It sets the position of this object with the given one
-	 * @param position new position
-	 */
-	setPosition(position) {
-		this._position = otherUtils.copyArray(position);
-		if(this._collisionObject!=null)
-			this._collisionObject.setPosition(position);
-	}
 
 
 }
@@ -3906,47 +2820,12 @@ class BirdNodeC extends NodeC {
  */
 class Rock1NodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -3958,70 +2837,6 @@ class Rock1NodeC extends NodeC {
 	 */
 	constructor() {
 		super();
-	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return Rock1NodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		Rock1NodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return Rock1NodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		Rock1NodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return Rock1NodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		Rock1NodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return Rock1NodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		Rock1NodeC._alphaTexture = alphaTexture;
 	}
 
 
@@ -4038,51 +2853,10 @@ class Rock1NodeC extends NodeC {
 		const collision = new ParallelepipedCollision(this._position, 5.47/2, 6.24, 4.65/2);
 		this.setCollisionOject(collision);
 	
-		await Rock1NodeC.loadNodeFromObjFile("rock1.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), 
+		await this.loadNodeFromObjFile("rock1.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
 	}
 
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(Rock1NodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			Rock1NodeC._vertices = objModel.vertices;
-			Rock1NodeC._normals = objModel.vertexNormals;
-			Rock1NodeC._indices = objModel.indices;
-			Rock1NodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, Rock1NodeC._vertices, Rock1NodeC._uv, Rock1NodeC._normals, Rock1NodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
-	}
 
 
 }
@@ -4094,47 +2868,12 @@ class Rock1NodeC extends NodeC {
  */
 class Rock2NodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -4146,70 +2885,6 @@ class Rock2NodeC extends NodeC {
 	 */
 	constructor() {
 		super();
-	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return Rock2NodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		Rock2NodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return Rock2NodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		Rock2NodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return Rock2NodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		Rock2NodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return Rock2NodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		Rock2NodeC._alphaTexture = alphaTexture;
 	}
 
 
@@ -4226,51 +2901,10 @@ class Rock2NodeC extends NodeC {
 		const collision = new ParallelepipedCollision(this._position, 4.67/2, 4.82, 4.25/2);
 		this.setCollisionOject(collision);
 	
-		await Rock2NodeC.loadNodeFromObjFile("rock2.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), 
+		await this.loadNodeFromObjFile("rock2.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
 	}
 
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(Rock2NodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			Rock2NodeC._vertices = objModel.vertices;
-			Rock2NodeC._normals = objModel.vertexNormals;
-			Rock2NodeC._indices = objModel.indices;
-			Rock2NodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, Rock2NodeC._vertices, Rock2NodeC._uv, Rock2NodeC._normals, Rock2NodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
-	}
 
 
 }
@@ -4282,47 +2916,12 @@ class Rock2NodeC extends NodeC {
  */
 class Rock3NodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -4333,70 +2932,6 @@ class Rock3NodeC extends NodeC {
 	 */
 	constructor() {
 		super();
-	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return Rock3NodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		Rock3NodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return Rock3NodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		Rock3NodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return Rock3NodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		Rock3NodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return Rock3NodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		Rock3NodeC._alphaTexture = alphaTexture;
 	}
 
 
@@ -4417,50 +2952,8 @@ class Rock3NodeC extends NodeC {
 		const sMatrix = utils.MakeNUScaleMatrix(this._scaling[0], this._scaling[1], this._scaling[2]);
 
 		const localMatrix = utils.multiplyMatrices(tMatrix, sMatrix);
-		await Rock3NodeC.loadNodeFromObjFile("rock3.obj", this, localMatrix,
+		await this.loadNodeFromObjFile("rock3.obj", this, localMatrix,
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
-	}
-
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(Rock3NodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			Rock3NodeC._vertices = objModel.vertices;
-			Rock3NodeC._normals = objModel.vertexNormals;
-			Rock3NodeC._indices = objModel.indices;
-			Rock3NodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, Rock3NodeC._vertices, Rock3NodeC._uv, Rock3NodeC._normals, Rock3NodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
 	}
 
 
@@ -4473,47 +2966,12 @@ class Rock3NodeC extends NodeC {
  */
 class SmallrockNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -4524,70 +2982,6 @@ class SmallrockNodeC extends NodeC {
 	 */
 	constructor() {
 		super();
-	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return SmallrockNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		SmallrockNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return SmallrockNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		SmallrockNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return SmallrockNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		SmallrockNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return SmallrockNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		SmallrockNodeC._alphaTexture = alphaTexture;
 	}
 
 
@@ -4604,50 +2998,8 @@ class SmallrockNodeC extends NodeC {
 		const collision = new ParallelepipedCollision(this._position, 1.64/2, 1.27, 1.34/2);
 		this.setCollisionOject(collision);
 	
-		await SmallrockNodeC.loadNodeFromObjFile("smallrock.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
+		await this.loadNodeFromObjFile("smallrock.obj", this, utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 		0.5, 0.2, 0.5, false, true, "Texture_01", ".jpg", false);
-	}
-
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-		
-		if(SmallrockNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			SmallrockNodeC._vertices = objModel.vertices;
-			SmallrockNodeC._normals = objModel.vertexNormals;
-			SmallrockNodeC._indices = objModel.indices;
-			SmallrockNodeC._uv= objModel.textures;
-		}
-		
-		node.setLocalMatrix(localMatrix);
-		
-		await NodeC.createAndloadDataOnGPUForNode(node, SmallrockNodeC._vertices, SmallrockNodeC._uv, SmallrockNodeC._normals, SmallrockNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
 	}
 
 
@@ -4660,47 +3012,12 @@ class SmallrockNodeC extends NodeC {
  */
 class SignNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -4711,70 +3028,6 @@ class SignNodeC extends NodeC {
 	 */
 	constructor() {
 		super();
-	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return SignNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		SignNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return SignNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		SignNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return SignNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		SignNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return SignNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		SignNodeC._alphaTexture = alphaTexture;
 	}
 
 
@@ -4796,51 +3049,10 @@ class SignNodeC extends NodeC {
 		localMatrix = utils.multiplyMatrices(utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]),
 			localMatrix);
 
-		await SignNodeC.loadNodeFromObjFile("sign.obj", this, localMatrix,
+		await this.loadNodeFromObjFile("sign.obj", this, localMatrix,
 			0.5, 0.2, 0.5, false, true, "sign", ".png", true);
 	}
 
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-
-		if(SignNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			SignNodeC._vertices = objModel.vertices;
-			SignNodeC._normals = objModel.vertexNormals;
-			SignNodeC._indices = objModel.indices;
-			SignNodeC._uv= objModel.textures;
-		}
-
-		node.setLocalMatrix(localMatrix);
-
-		await NodeC.createAndloadDataOnGPUForNode(node, SignNodeC._vertices, SignNodeC._uv, SignNodeC._normals, SignNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
-	}
 
 
 }
@@ -4852,47 +3064,12 @@ class SignNodeC extends NodeC {
  */
 class BladesNodeC extends NodeC {
 	/**
-	 * Vertices of the object.
-	 * @private
+	 * Data loaded from the obj file
+	 * @type {ObjData}
 	 */
-	static _vertices=null;
+	static _objData = new ObjData();
 	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _normals=null;
-	/**
-	 * Normal vectors of the object.
-	 * @private
-	 */
-	static _indices=null;
-	/**
-	 * Indices of the object.
-	 * @private
-	 */
-	static _uv=null;
-	/**
-	 * Albedo texture of the object.
-	 * @private
-	 */
-	static _albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 * @private
-	 */
-	static _normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 * @private
-	 */
-	static _muTexture = null;
-	/**
-	 * Texture that contains the encoding of the roughness.
-	 * @private
-	 */
-	static _alphaTexture = null;
-	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 * @type {Drawing}
 	 */
 	static _drawing = new Drawing();
@@ -4903,70 +3080,6 @@ class BladesNodeC extends NodeC {
 	 */
 	constructor() {
 		super();
-	}
-
-	/**
-	 * It returns the albedo texture.
-	 * @returns albedo texture.
-	 */
-	getAlbedoTexture() {
-		return BladesNodeC._albedoTexture;
-	}
-
-	/**
-	 * It sets the albedo texture with the given one.
-	 * @param albedoTexture albedo texture.
-	 */
-	setAlbedoTexture(albedoTexture) {
-		BladesNodeC._albedoTexture = albedoTexture;
-	}
-
-	/**
-	 * It returns the normal texture.
-	 * @returns normal texture.
-	 */
-	getNormalTexture() {
-		return BladesNodeC._normalTexture;
-	}
-
-	/**
-	 * It sets the normal texture with the given one.
-	 * @param normalTexture normal texture.
-	 */
-	setNormalTexture(normalTexture) {
-		BladesNodeC._normalTexture = normalTexture;
-	}
-
-	/**
-	 * It returns the metalness texture.
-	 * @returns metalness texture.
-	 */
-	getMuTexture() {
-		return BladesNodeC._muTexture;
-	}
-
-	/**
-	 * It sets the metalness texture with the given one.
-	 * @param muTexture metalness texture.
-	 */
-	setMuTexture(muTexture) {
-		BladesNodeC._muTexture = muTexture;
-	}
-
-	/**
-	 * It returns the roughness texture.
-	 * @returns roughness texture.
-	 */
-	getAlphaTexture() {
-		return BladesNodeC._alphaTexture;
-	}
-
-	/**
-	 * It sets the roughness texture with the given one.
-	 * @param alphaTexture roughness texture.
-	 */
-	setAlphaTexture(alphaTexture) {
-		BladesNodeC._alphaTexture = alphaTexture;
 	}
 
 
@@ -4985,51 +3098,10 @@ class BladesNodeC extends NodeC {
 
 		const localMatrix = utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]);
 
-		await BladesNodeC.loadNodeFromObjFile("blades.obj", this, localMatrix,
+		await this.loadNodeFromObjFile("blades.obj", this, localMatrix,
 			0.5, 0.2, 0.5, false, true, "sign", ".png", true);
 	}
 
-	/**
-	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
-	 * It sets the local matrix. Then it sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
-	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
-	 * loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
-	 * All these setting are done only if the corresponding variables were not set up before.
-	 * @param objFilename name of the obj file
-	 * @param node node of which the variables are set
-	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering)
-	 * @param textureName name of the textures
-	 * @param textureFileExtension extension of the textures
-	 * @param useNormalTexture whether to use the texture for the normal vectors
-	 */
-	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
-
-		if(BladesNodeC._vertices==null) {
-			const objModel = await NodeC.loadObjFile(objFilename);
-
-			BladesNodeC._vertices = objModel.vertices;
-			BladesNodeC._normals = objModel.vertexNormals;
-			BladesNodeC._indices = objModel.indices;
-			BladesNodeC._uv= objModel.textures;
-		}
-
-		node.setLocalMatrix(localMatrix);
-
-		await NodeC.createAndloadDataOnGPUForNode(node, BladesNodeC._vertices, BladesNodeC._uv, BladesNodeC._normals, BladesNodeC._indices, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
-	}
-
-	/**
-	 * It returns the shader program.
-	 * @returns shader program
-	 */
-	getProgram() {
-		return this.getShadersType().program;
-	}
 
 
 }

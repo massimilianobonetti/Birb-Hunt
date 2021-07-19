@@ -10578,7 +10578,7 @@
 											"_parent": {
 												"$ref": "AAAAAAF6hT5qPa4c0Kw="
 											},
-											"font": "Arial;13;3",
+											"font": "Arial;13;1",
 											"left": 757,
 											"top": 319,
 											"width": 41.919921875,
@@ -16193,8 +16193,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "NodeC",
-					"isAbstract": true
+					"name": "NodeC"
 				},
 				{
 					"_type": "UMLClass",
