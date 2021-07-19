@@ -1,0 +1,11 @@
+load:
+  - lib/utils.js
+  - lib/otherUtils.js
+  - Collision.js
+  - NodeC.js
+  - audio.js
+  - mainScript.js
+test:
+  - tests/Collision.spec.js
+  - tests/NodeC.spec.js
+  - tests/otherUtils.spec.js

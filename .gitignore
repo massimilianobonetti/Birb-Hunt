@@ -1,0 +1,7 @@
+# files not to ignore
+!.gitignore
+!README.md
+
+# files to ignore
+.DS_Store
+
