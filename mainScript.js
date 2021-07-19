@@ -1399,29 +1399,27 @@ function animateLight() {
 	if(lastUpdateTime) {
 		const time = (currentTime-firstTime);
 		const millisecondsPerSecond = 1000;
-		const secondsPerPiece = 60;
+		const secondsPerPiece = 15; //60
 		const piecesPerRound = 4;
 		const angle = 2*Math.PI*(time/millisecondsPerSecond)/secondsPerPiece/piecesPerRound;
 
 		const ANGLE_SHIFT = otherUtils.degToRad(0);
 		directionalLight = [-Math.sin(angle+ANGLE_SHIFT), -Math.cos(angle+ANGLE_SHIFT), 0];
-
-		if(-Math.cos(angle+ANGLE_SHIFT)<0) {
+		const COSINE_OF_THE_HORIZON=0;
+		if(Math.cos(angle+ANGLE_SHIFT)>=COSINE_OF_THE_HORIZON) {
 			const redIntensityScale = 1.0;
 			const greenIntensityScale = 1.0;
 			const blueIntensityScale = 1.0;
 			directionalLightColor = [255.0/255.0*redIntensityScale, 255.0/255.0*greenIntensityScale, 200.0/255.0*blueIntensityScale];
-			
-			
-			const NIGHT_ANGLE = otherUtils.degToRad(70);
-
-			if(Math.cos(angle+ANGLE_SHIFT)<Math.cos(NIGHT_ANGLE)) {
-				isNight = true;
-			} else {
-				isNight = false;
-			}
 		} else {
 			directionalLightColor = [0, 0, 0];
+		}
+
+		const NIGHT_ANGLE = otherUtils.degToRad(70);
+		if(Math.cos(angle+ANGLE_SHIFT)<Math.cos(NIGHT_ANGLE)) {
+			isNight = true;
+		} else {
+			isNight = false;
 		}
 
 	}
