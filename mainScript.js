@@ -406,7 +406,7 @@ async function main() {
  */
 function printIntroductoryText() {
 	document.getElementById("firstText").innerHTML = "Welcome to Birb hunt!<br>" +
-		"Your objective is to find the hidden birb!<br><br>" +
+		"Your objective is to find and click the hidden birb!<br><br>" +
 		"Use w, s, a, d to move<br>" +
 		"Use up-, down-, left-, right-arrow to rotate the view<br>" +
 		"Use q, e to roll<br>" +
@@ -1506,6 +1506,7 @@ function setLightPositionsAndDirections() {
 function drawNodeFirstTime(node) {
 	gl.useProgram(node.getProgram());
 
+	setLightPositionsAndDirections();
 	sendTheMutableUniforms(node);
 	sendTheImmutableUniforms(node);
 
@@ -1541,7 +1542,6 @@ function sendTheMutableUniforms(node) {
 	gl.uniform3fv(node.getHemisphericDLoc(), hemisphericDTransformed);
 
 
-	setLightPositionsAndDirections();
 	gl.uniform3fv(node.getPl1PosLoc(), pl1Pos);
 	gl.uniform3fv(node.getPl2PosLoc(), pl2Pos);
 	gl.uniform3fv(node.getSpotPosLoc(), spotPos);
@@ -1549,6 +1549,9 @@ function sendTheMutableUniforms(node) {
 	gl.uniform1i(node.getIsNightLoc(), isNight);
 
 	if(node.getShadersType().id==ShadersType.pbr.id) {
+		gl.uniform1i(node.getUseTexturesForMuAlphaLoc(), node.getUseTexturesForMuAlpha());
+		gl.uniform1i(node.getUseClassicF0FormulaLoc(), node.getUseClassicF0Formula());
+
 		if(isChangeLight) {
 			gl.uniform1f(node.getMuPersonalLoc(), globalMuPersonal);
 			gl.uniform1f(node.getAlphaPersonalLoc(), globalAlphaPersonal);
@@ -1562,13 +1565,16 @@ function sendTheMutableUniforms(node) {
 		if(node.getUseTexturesForMuAlpha()) {
 			gl.activeTexture(gl.TEXTURE2);
 			gl.bindTexture(gl.TEXTURE_2D, node.getMuTexture());
+			gl.uniform1i(node.getMuTextureLoc(), 2);
 
 			gl.activeTexture(gl.TEXTURE3);
 			gl.bindTexture(gl.TEXTURE_2D, node.getAlphaTexture());
+			gl.uniform1i(node.getAlphaTextureLoc(), 3);
 		}
 
 
 	} else if(node.getShadersType().id==ShadersType.orenNayar.id) {
+		gl.uniform1i(node.getUseTexturesForMuAlphaLoc(), node.getUseTexturesForMuAlpha());
 		if(isChangeLight) {
 			gl.uniform1f(node.getAlphaPersonalLoc(), globalAlphaPersonal);
 		} else {
@@ -1578,16 +1584,21 @@ function sendTheMutableUniforms(node) {
 		if(node.getUseTexturesForMuAlpha()) {
 			gl.activeTexture(gl.TEXTURE2);
 			gl.bindTexture(gl.TEXTURE_2D, node.getMuTexture());
+			gl.uniform1i(node.getMuTextureLoc(), 2);
 		}
 
 	}
 
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, node.getAlbedoTexture());
+	gl.uniform1i(node.getAlbedoTextureLoc(), 0);
+
+	gl.uniform1i(node.getUseNormalTextureLoc(), node.getUseNormalTexture());
 
 	if(node.getUseNormalTexture()) {
 		gl.activeTexture(gl.TEXTURE1);
 		gl.bindTexture(gl.TEXTURE_2D, node.getNormalTexture());
+		gl.uniform1i(node.getNormalTextureLoc(), 1);
 	}
 }
 
@@ -1599,7 +1610,6 @@ function sendTheImmutableUniforms(node) {
 	gl.uniform3fv(node.getHemiLightUpperLoc(), HEMISPHERIC_L_UPPER_COLOR);
 	gl.uniform3fv(node.getHemiLightLowerLoc(), HEMISPHERIC_L_LOWER_COLOR);
 
-
 	gl.uniform3fv(node.getPl1ColorLoc(), [200.0/255.0, 75.0/255.0, 75.0/255.0]);
 	gl.uniform3fv(node.getPl2ColorLoc(), [100.0/255.0, 200.0/255.0, 100.0/255.0]);
 	gl.uniform1f(node.getPlTargetLoc(), 10);
@@ -1609,33 +1619,6 @@ function sendTheImmutableUniforms(node) {
 	gl.uniform1f(node.getSpotDecayLoc(), 2);
 	gl.uniform1f(node.getSpotConeInLoc(), 70.0);
 	gl.uniform1f(node.getSpotConeOutLoc(), 100.0);
-
-	if(node.getShadersType().id===ShadersType.pbr.id) {
-		gl.uniform1i(node.getUseTexturesForMuAlphaLoc(), node.getUseTexturesForMuAlpha());
-		gl.uniform1i(node.getUseClassicF0FormulaLoc(), node.getUseClassicF0Formula());
-
-		if(node.getUseTexturesForMuAlpha()) {
-			gl.uniform1i(node.getMuTextureLoc(), 2);
-
-			gl.uniform1i(node.getAlphaTextureLoc(), 3);
-		}
-
-	} else if(node.getShadersType().id===ShadersType.orenNayar.id) {
-		gl.uniform1i(node.getUseTexturesForMuAlphaLoc(), node.getUseTexturesForMuAlpha());
-
-		if(node.getUseTexturesForMuAlpha()) {
-			gl.uniform1i(node.getMuTextureLoc(), 2);
-		}
-	}
-
-
-	gl.uniform1i(node.getUseNormalTextureLoc(), node.getUseNormalTexture());
-
-	gl.uniform1i(node.getAlbedoTextureLoc(), 0);
-
-	if(node.getUseNormalTexture()) {
-		gl.uniform1i(node.getNormalTextureLoc(), 1);
-	}
 }
 
 /**
@@ -1645,6 +1628,7 @@ function sendTheImmutableUniforms(node) {
 function drawNode(node) {
 	gl.useProgram(node.getProgram());
 
+	setLightPositionsAndDirections();
 	sendTheMutableUniforms(node);
 
 	gl.bindVertexArray(node.getVao());
