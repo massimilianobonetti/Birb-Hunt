@@ -1138,7 +1138,7 @@ function drawSceneFirstTime() {
 		drawNodeFirstTime(object);
 	}
 
-	drawSkyMapFirstTime();
+	drawSkyMap();
 	drawLifeIndicator();
 
 	if(!isGameOver) {
@@ -1641,32 +1641,9 @@ function drawNode(node) {
 }
 
 /**
- * It draws the sky map and sets the uniforms that could have been changed
- */
-function drawSkyMap() {
-	gl.useProgram(skyMapNode.getProgram());
-
-	gl.activeTexture(gl.TEXTURE0+3);
-	gl.bindTexture(gl.TEXTURE_CUBE_MAP, skyMapNode.getAlbedoTexture());
-
-	const invViewProjMatrix = utils.invertMatrix(vpMatrix);
-	gl.uniformMatrix4fv(skyMapNode.getInvViewProjMatrixLoc(), gl.FALSE, utils.transposeMatrix(invViewProjMatrix));
-
-	gl.uniform1i(skyMapNode.getIsNightLoc(), isNight);
-
-	gl.bindVertexArray(skyMapNode.getVao());
-	gl.depthFunc(gl.LEQUAL);
-	const PRIMITIVE_TYPE = gl.TRIANGLES;
-	const OFFSET = 0;
-	const COUNT = 6;
-	gl.drawArrays(PRIMITIVE_TYPE, OFFSET, COUNT);
-
-}
-
-/**
  * It draws the sky map and sets all the needed uniforms
  */
-function drawSkyMapFirstTime() {
+function drawSkyMap() {
 	gl.useProgram(skyMapNode.getProgram());
 
 	gl.activeTexture(gl.TEXTURE0+3);
