@@ -15,6 +15,56 @@ const ShadersType = {"pbr": {id: 1, name: "pbrTex", program: null, locations: nu
 Object.freeze(ShadersType);
 
 /**
+ * Type of the texture, whether it is an albedo texture, normal texture, metalness texture or
+ * roughness texture
+ */
+const TextureType = {"albedo": {id: 1, name:"albedo"},
+	"normal": {id: 2, name:"normal-ogl"},
+	"mu": {id: 3, name:"metallic"},
+	"alpha": {id: 4, name:"roughness"}};
+Object.freeze(ShadersType);
+
+/**
+ * It contains the loaded textures
+ * @type {[Texture]}
+ */
+var textures=[];
+
+/**
+ * Class that contains the texture, the filename of the texture and its type
+ */
+class Texture {
+	/**
+	 * Name of the texture
+	 */
+	_name;
+	/**
+	 * Albedo texture of the object.
+	 */
+	_texture = null;
+	/**
+	 * Constructor of Texture. It creates an object with the default values as attributes
+	 */
+	constructor() {
+	}
+
+	/**
+	 * It returns the texture with the given name from the already loaded textures. If the required
+	 * textures is not present, then null is returned.
+	 * @param name name of the texture to retrieve from the already loaded textures
+	 * @returns {Texture|null} found texture if present, otherwise null
+	 */
+	static findTexture(name) {
+		for(var textureObject of textures) {
+			if(textureObject._name.localeCompare(name)==0) {
+				return textureObject;
+			}
+		}
+		return null
+	}
+}
+
+/**
  * It contains the locations of the uniforms in the memory
  */
 class Locations {
@@ -1399,6 +1449,7 @@ class NodeC {
 	/**
 	 * It loads the textures for the albedo, the normal (if needed), the metalness (if needed) and the roughness (if needed).
 	 * All these setting are done only if the corresponding variables were not set up before.
+	 * If the texture was already loaded in the past then it is retrieved from the saved textures.
 	 * @param node node of which the variables are set.
 	 * @param textureName name of the textures.
 	 * @param fileExtension file extension of the textures.
@@ -1407,39 +1458,67 @@ class NodeC {
 	 */
 	static async setTextures(node, textureName, fileExtension, useTexturesForMuAlpha, useNormalTexture) {
 		if(node.getAlbedoTexture()==null) {
-			const path = window.location.pathname;
-			const page = path.split("/").pop();
-			const baseDir = window.location.href.replace(page, '');
-			const texturesDir = baseDir + "textures/";
 
-			//Load the textures
-			var texture = await NodeC.loadTexture(texturesDir + textureName + "-bl/" + textureName + "_albedo" + fileExtension, 0);
-			node.setAlbedoTexture(texture);
+			node.setAlbedoTexture(await NodeC.getTexture(textureName, fileExtension,0, TextureType.albedo));
 
 			if (useNormalTexture) {
-				texture = await NodeC.loadTexture(texturesDir + textureName + "-bl/" + textureName + "_normal-ogl" + fileExtension, 1);
-				node.setNormalTexture(texture);
+				node.setNormalTexture(await NodeC.getTexture(textureName, fileExtension,1, TextureType.normal));
 			}
 
 			if (useTexturesForMuAlpha) {
-				texture = await NodeC.loadTexture(texturesDir + textureName + "-bl/" + textureName + "_metallic" + fileExtension, 2);
-				node.setMuTexture(texture);
+				node.setMuTexture(await NodeC.getTexture(textureName, fileExtension,2, TextureType.mu));
 
-				texture = await NodeC.loadTexture(texturesDir + textureName + "-bl/" + textureName + "_roughness" + fileExtension, 3);
-				node.setAlphaTexture(texture);
+				node.setAlphaTexture(await NodeC.getTexture(textureName, fileExtension,3, TextureType.alpha));
+
 			}
+
 		}
 		
 	}
 
 	/**
-	 * It loads the texture from the path specified in src, the texture is set in the slot
-	 * gl.TEXTURE0+slot.
-	 * @param src file path of the texture.
+	 * It finds the texture	from the already loaded textures. If it is present then it is returned, otherwise it
+	 * loads the texture with with name textureName, type textureType and with the file extension fileExtension.
+	 * The texture is put in the slot gl.TEXTURE0+slot.
+	 * If the texture is loaded from the server, then it is saved in the array textures for future usages.
+	 * @param textureName name of the texture.
+	 * @param fileExtension file extension of the textures.
 	 * @param slot slot in which the texture is put.
+	 * @param textureType type of the texture.
+	 */
+	static async getTexture(textureName, fileExtension, slot, textureType) {
+		var textureObject = Texture.findTexture(textureName+"_"+textureType.name);
+		var texture;
+		if(textureObject!=null) {
+			texture =  textureObject._texture;
+		} else {
+			texture = await NodeC.loadTexture(textureName, fileExtension, slot, textureType);
+			textureObject = new Texture();
+			textureObject._name = textureName+"_"+textureType.name;
+			textureObject._texture = texture;
+			textures.push(textureObject);
+		}
+		console.log(texture);
+		return texture;
+	}
+
+	/**
+	 * It loads the texture with with name textureName, type textureType and with the file extension fileExtension.
+	 * The texture is put in the slot gl.TEXTURE0+slot.
+	 * @param textureName name of the texture.
+	 * @param fileExtension file extension of the textures.
+	 * @param slot slot in which the texture is put.
+	 * @param textureType type of the texture.
 	 * @returns {WebGLTexture} texture that was loaded from the path specified in src.
 	 */
-	static async loadTexture(src, slot) {
+	static async loadTexture(textureName, fileExtension, slot, textureType) {
+		const path = window.location.pathname;
+		const page = path.split("/").pop();
+		const baseDir = window.location.href.replace(page, '');
+		const texturesDir = baseDir + "textures/";
+
+		const src = texturesDir + textureName + "-bl/" + textureName + "_" + textureType.name + fileExtension;
+
 		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 		const textureImage = new Image();
 		textureImage.src = src;
@@ -1468,13 +1547,6 @@ class NodeC {
 	async createObject() {
 	}
 
-	/**
-	 * It says whether the program was set up before.
-	 * @returns {boolean} whether the program was set up before.
-	 */
-	isProgramPresent() {
-		return false;
-	}
 
 }
 

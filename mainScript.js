@@ -773,7 +773,7 @@ async function initializePrograms() {
 	const baseDir = window.location.href.replace(page, '');
 	const shaderDir = baseDir+"shaders/";
 	
-	for(const object of objectsWithShaders) {
+	for(var object of objectsWithShaders) {
 		if(object.getShadersType().program==null) {
 			const shadersFileName = object.getShadersType().name;
 
@@ -803,7 +803,7 @@ async function loadDataForTheScene() {
 
 	await createField();
 
-	for(const object of generalObjectsToDraw) {
+	for(var object of generalObjectsToDraw) {
 		await object.createObject();
 	}
 
@@ -1071,7 +1071,7 @@ async function createSkyMap() {
 	gl.bindTexture(gl.TEXTURE_CUBE_MAP, skyboxTexture);
 	skyMapNode.setAlbedoTexture(skyboxTexture);
 
-	for(const face of FACES) {
+	for(var face of FACES) {
 		const {target, url} = face;
         
         // Upload the canvas to the cubemap face.
@@ -1118,7 +1118,7 @@ function drawSceneFirstTime() {
 
 	drawNodeFirstTime(fieldNode);
 
-	for(const object of generalObjectsToDraw) {
+	for(var object of generalObjectsToDraw) {
 		drawNodeFirstTime(object);
 	}
 
@@ -1161,7 +1161,7 @@ function drawScene() {
 
 	drawNode(fieldNode);
 	
-	for(const object of generalObjectsToDraw) {
+	for(var object of generalObjectsToDraw) {
 		drawNode(object);
 	}
 
@@ -1943,7 +1943,7 @@ function checkBirdSelection(event) {
 	var nearestIntersectedObject;
 
 	//Check for collision with the bird
-	for(const object of objectsWithCollision) {
+	for(var object of objectsWithCollision) {
 		var distance=[0];
 		if(object.getCollisionObject().checkRayIntersection(rayStartPoint, normalisedRayDir, distance)) {
 			if(distance[0]<MAX_DISTANCE_FROM_BIRD_TO_CAPTURE && distance[0]<minimumDistance) {

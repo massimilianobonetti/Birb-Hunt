@@ -114,3 +114,26 @@ TestCase("ShadersType test", {
         assertEquals(4, ShadersType.orenNayar.id);
     }
 });
+
+TestCase("Texture test", {
+    "test findTexture name": function() {
+        const t1 = new Texture();
+        t1._name = "t1";
+        t1._texture = new Object();
+        const t2 = new Texture();
+        t2._name = "t2";
+        t2._texture = new Object();
+        const t3 = new Texture();
+        t3._name = "t3";
+        t3._texture = new Object();
+        textures.push(t1);
+        textures.push(t3);
+        textures.push(t2);
+        var foundTexture = Texture.findTexture("t3");
+        assertEquals(t3, foundTexture);
+        foundTexture = Texture.findTexture("t2");
+        assertEquals(t2, foundTexture);
+        foundTexture = Texture.findTexture("t1");
+        assertEquals(t1, foundTexture);
+    }
+});
