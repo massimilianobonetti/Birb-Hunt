@@ -9,11 +9,6 @@ class Life {
      */
     _vao = null;
     /**
-     * Shader program.
-     * @private
-     */
-    _program=null;
-    /**
      * Number of indices of the object
      * @type {number}
      * @private
@@ -85,16 +80,7 @@ class Life {
      * @returns shader program
      */
     getProgram() {
-        return this._program;
-    }
-
-    /**
-     * It sets the shader program with the given one if the shader program of this
-     * object is not null.
-     * @param program shader program
-     */
-    setProgram(program) {
-        this._program = program;
+        return this.getShadersType().program;
     }
 
 
@@ -162,13 +148,6 @@ class Life {
         this._life = life;
     }
 
-    /**
-     * It says whether the program was set up before.
-     * @returns {boolean} whether the program was set up before.
-     */
-    isProgramPresent() {
-        return this._program!=null;
-    }
     /**
      * It returns the canvasWidthLoc
      * @returns canvasWidthLoc

@@ -206,11 +206,6 @@ var isUpArrowPressed = false;
 var isDownArrowPressed = false;
 
 /**
- * Whether to enter in debug mode
- * @type {boolean}
- */
-const IS_DEBUG = false;
-/**
  * Whether to use the personalized metalness and roughness given by the user
  * @type {boolean}
  */
@@ -355,14 +350,6 @@ var hasFinishedLoading=false;
  */
 const FIELD_RANGE = 40.0;
 
-/**
- * Used only for debugging, it can be removed, it prints the given message on the console
- * @param {string} msg - string message to print on the console
- */
-function printD(msg) {
-	if(IS_DEBUG)
-		console.log(msg);
-}
 
 /**
  * Main function that defines the application "Birb hunt". First it prints the introductory text,
@@ -791,14 +778,15 @@ async function initializePrograms() {
 	const shaderDir = baseDir+"shaders/";
 	
 	for(const object of objectsWithShaders) {
-		if(!object.isProgramPresent()) {
+		if(object.getShadersType().program==null) {
 			const shadersFileName = object.getShadersType().name;
 
 			await utils.loadFiles([shaderDir + shadersFileName + '_vs.glsl', shaderDir + shadersFileName + '_fs.glsl'], function (shaderText) {
 				var vertexShader = utils.createShader(gl, gl.VERTEX_SHADER, shaderText[0]);
 				var fragmentShader = utils.createShader(gl, gl.FRAGMENT_SHADER, shaderText[1]);
-		
-				object.setProgram(utils.createProgram(gl, vertexShader, fragmentShader));
+
+				object.getShadersType().program = utils.createProgram(gl, vertexShader, fragmentShader);
+
 			});
 		}
 	}

@@ -5,12 +5,12 @@
  * one shader used to draw the sky map,
  * one shader used to draw the life indicator of the player.
  */
-const ShadersType = {"pbr": {id: 1, name: "pbrTex"},
-	"phong": {id: 2, name: "phong"},
-	"blinn": {id: 3, name: "blinn"},
-	"orenNayar": {id: 4, name: "orenNayar"},
-	"skyMap": {id: 5, name: "skyMap"},
-	"life": {id: 6, name: "life"}};
+const ShadersType = {"pbr": {id: 1, name: "pbrTex", program: null},
+	"phong": {id: 2, name: "phong", program: null},
+	"blinn": {id: 3, name: "blinn", program: null},
+	"orenNayar": {id: 4, name: "orenNayar", program: null},
+	"skyMap": {id: 5, name: "skyMap", program: null},
+	"life": {id: 6, name: "life", program: null}};
 Object.freeze(ShadersType);
 
 /**
@@ -381,14 +381,6 @@ class NodeC {
 	 */
 	getProgram() {
 		return null;
-	}
-
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
 	}
 
 	/**
@@ -1497,11 +1489,6 @@ class NodeC {
  */
 class GenericNodeC extends NodeC {
 	/**
-	 * Shader program.
-	 * @private
-	 */
-	_program=null;
-	/**
 	 * Albedo texture.
 	 * @private
 	 */
@@ -1539,16 +1526,7 @@ class GenericNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return this._program;
-	}
-
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		this._program = program;
+		return this.getShadersType().program;
 	}
 
 	/**
@@ -2384,11 +2362,6 @@ class SpruceNodeC extends NodeC {
 	 */
 	static _uv=null;
 	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
-	/**
 	 * Albedo texture of the object.
 	 * @private
 	 */
@@ -2485,13 +2458,6 @@ class SpruceNodeC extends NodeC {
 		SpruceNodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return SpruceNodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -2553,18 +2519,9 @@ class SpruceNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return SpruceNodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(SpruceNodeC._program==null)
-			SpruceNodeC._program = program;
-	}
 
 }
 
@@ -2594,11 +2551,6 @@ class DeadTreeNodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -2697,14 +2649,6 @@ class DeadTreeNodeC extends NodeC {
 	}
 
 	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return DeadTreeNodeC._program != null;
-	}
-
-	/**
 	 * It sets up the attributes of this object.
 	 * In particular it sets up the collision object.
 	 * It loads the vertices, the normal vectors, the indices and the uv coordinates if they were not loaded before.
@@ -2765,18 +2709,9 @@ class DeadTreeNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return DeadTreeNodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(DeadTreeNodeC._program==null)
-			DeadTreeNodeC._program = program;
-	}
 
 }
 
@@ -2806,11 +2741,6 @@ class CircularSpruceNodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -2908,13 +2838,6 @@ class CircularSpruceNodeC extends NodeC {
 		CircularSpruceNodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return CircularSpruceNodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -2972,18 +2895,9 @@ class CircularSpruceNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return CircularSpruceNodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(CircularSpruceNodeC._program==null)
-			CircularSpruceNodeC._program = program;
-	}
 
 }
 
@@ -3013,11 +2927,6 @@ class MaritimePineNodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -3116,13 +3025,6 @@ class MaritimePineNodeC extends NodeC {
 		MaritimePineNodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return MaritimePineNodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -3180,18 +3082,9 @@ class MaritimePineNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return MaritimePineNodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(MaritimePineNodeC._program==null)
-			MaritimePineNodeC._program = program;
-	}
 
 }
 
@@ -3221,11 +3114,6 @@ class StumpNodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -3325,13 +3213,6 @@ class StumpNodeC extends NodeC {
 		StumpNodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return StumpNodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -3389,17 +3270,7 @@ class StumpNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return StumpNodeC._program;
-	}
-
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(StumpNodeC._program==null)
-			StumpNodeC._program = program;
+		return this.getShadersType().program;
 	}
 
 }
@@ -3430,11 +3301,6 @@ class FlowerNodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -3534,13 +3400,6 @@ class FlowerNodeC extends NodeC {
 		FlowerNodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return FlowerNodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -3598,17 +3457,7 @@ class FlowerNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return FlowerNodeC._program;
-	}
-
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(FlowerNodeC._program==null)
-			FlowerNodeC._program = program;
+		return this.getShadersType().program;
 	}
 
 }
@@ -3639,11 +3488,6 @@ class PlantNodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -3743,13 +3587,6 @@ class PlantNodeC extends NodeC {
 		PlantNodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return PlantNodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -3807,18 +3644,9 @@ class PlantNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return PlantNodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(PlantNodeC._program==null)
-			PlantNodeC._program = program;
-	}
 
 }
 
@@ -3848,11 +3676,6 @@ class BirdNodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -3951,13 +3774,6 @@ class BirdNodeC extends NodeC {
 		BirdNodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return BirdNodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -4015,18 +3831,9 @@ class BirdNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return BirdNodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(BirdNodeC._program==null)
-			BirdNodeC._program = program;
-	}
 
 	/**
 	 * It sets the position of this object with the given one
@@ -4067,11 +3874,6 @@ class Rock1NodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -4171,13 +3973,6 @@ class Rock1NodeC extends NodeC {
 		Rock1NodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return Rock1NodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -4235,18 +4030,9 @@ class Rock1NodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return Rock1NodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(Rock1NodeC._program==null)
-			Rock1NodeC._program = program;
-	}
 
 }
 
@@ -4276,11 +4062,6 @@ class Rock2NodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -4380,13 +4161,6 @@ class Rock2NodeC extends NodeC {
 		Rock2NodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return Rock2NodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -4425,7 +4199,7 @@ class Rock2NodeC extends NodeC {
 	 */
 	static async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture) {
 		
-		if(Rock2NodeC._program_vertices==null) {
+		if(Rock2NodeC._vertices==null) {
 			const objModel = await NodeC.loadObjFile(objFilename);
 
 			Rock2NodeC._vertices = objModel.vertices;
@@ -4444,18 +4218,9 @@ class Rock2NodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return Rock2NodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(Rock2NodeC._program==null)
-			Rock2NodeC._program = program;
-	}
 
 }
 
@@ -4485,11 +4250,6 @@ class Rock3NodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -4588,13 +4348,6 @@ class Rock3NodeC extends NodeC {
 		Rock3NodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return Rock3NodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -4656,18 +4409,9 @@ class Rock3NodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return Rock3NodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(Rock3NodeC._program==null)
-			Rock3NodeC._program = program;
-	}
 
 }
 
@@ -4697,11 +4441,6 @@ class SmallrockNodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -4800,13 +4539,6 @@ class SmallrockNodeC extends NodeC {
 		SmallrockNodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return SmallrockNodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -4864,18 +4596,9 @@ class SmallrockNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return SmallrockNodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(SmallrockNodeC._program==null)
-			SmallrockNodeC._program = program;
-	}
 
 }
 
@@ -4905,11 +4628,6 @@ class SignNodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -5008,13 +4726,6 @@ class SignNodeC extends NodeC {
 		SignNodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return SignNodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -5077,18 +4788,9 @@ class SignNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return SignNodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(SignNodeC._program==null)
-			SignNodeC._program = program;
-	}
 
 }
 
@@ -5118,11 +4820,6 @@ class BladesNodeC extends NodeC {
 	 * @private
 	 */
 	static _uv=null;
-	/**
-	 * Shader program of the object.
-	 * @private
-	 */
-	static _program=null;
 	/**
 	 * Albedo texture of the object.
 	 * @private
@@ -5221,13 +4918,6 @@ class BladesNodeC extends NodeC {
 		BladesNodeC._alphaTexture = alphaTexture;
 	}
 
-	/**
-	 * It says whether the shader program is present or not.
-	 * @returns {boolean} whether the shader program is present.
-	 */
-	isProgramPresent() {
-		return BladesNodeC._program != null;
-	}
 
 	/**
 	 * It sets up the attributes of this object.
@@ -5287,18 +4977,9 @@ class BladesNodeC extends NodeC {
 	 * @returns shader program
 	 */
 	getProgram() {
-		return BladesNodeC._program;
+		return this.getShadersType().program;
 	}
 
-	/**
-	 * It sets the shader program with the given one if the shader program of this
-	 * object is not null.
-	 * @param program shader program
-	 */
-	setProgram(program) {
-		if(BladesNodeC._program==null)
-			BladesNodeC._program = program;
-	}
 
 }
 
