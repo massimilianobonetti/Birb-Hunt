@@ -467,20 +467,17 @@ function createNodes() {
 	rootNode = new GenericNodeC();
 
 	fieldNode = new GenericNodeC();
-	fieldNode.setName("field");
 	fieldNode.setShadersType(ShadersType.pbr);
 	fieldNode.setParent(rootNode);
 	objectsWithShaders.push(fieldNode);
 	objectsWithCollision.push(fieldNode);
 
 	skyMapNode = new GenericNodeC();
-	skyMapNode.setName("skyMap");
 	skyMapNode.setShadersType(ShadersType.skyMap);
 	skyMapNode.setParent(rootNode);
 	objectsWithShaders.push(skyMapNode);
 
 	birdNode = new BirdNodeC();
-	birdNode.setName("bird");
 	birdNode.setShadersType(ShadersType.pbr);
 	birdNode.setParent(rootNode);
 	setBirdPosition();
@@ -639,7 +636,6 @@ function createNodes() {
  * @returns the created node
  */
 function setNode(node, position, name, shaderType) {
-	node.setName(name);
 	node.setShadersType(shaderType);
 	node.setParent(rootNode);
 	node.setPosition(position);
@@ -786,7 +782,7 @@ async function initializePrograms() {
 				var fragmentShader = utils.createShader(gl, gl.FRAGMENT_SHADER, shaderText[1]);
 
 				object.getShadersType().program = utils.createProgram(gl, vertexShader, fragmentShader);
-
+				object.getShadersType().locations = new Locations();
 			});
 		}
 	}

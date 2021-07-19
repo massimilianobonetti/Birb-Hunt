@@ -4,35 +4,20 @@
  * one shader with Blinn and Lambert reflection, one shader with Oren-Nayar reflection,
  * one shader used to draw the sky map,
  * one shader used to draw the life indicator of the player.
+ * Each type contains one identifier, one name and one program (which contains the shaders).
  */
-const ShadersType = {"pbr": {id: 1, name: "pbrTex", program: null},
-	"phong": {id: 2, name: "phong", program: null},
-	"blinn": {id: 3, name: "blinn", program: null},
-	"orenNayar": {id: 4, name: "orenNayar", program: null},
-	"skyMap": {id: 5, name: "skyMap", program: null},
-	"life": {id: 6, name: "life", program: null}};
+const ShadersType = {"pbr": {id: 1, name: "pbrTex", program: null, locations: null},
+	"phong": {id: 2, name: "phong", program: null, locations: null},
+	"blinn": {id: 3, name: "blinn", program: null, locations: null},
+	"orenNayar": {id: 4, name: "orenNayar", program: null, locations: null},
+	"skyMap": {id: 5, name: "skyMap", program: null, locations: null},
+	"life": {id: 6, name: "life", program: null, locations: null}};
 Object.freeze(ShadersType);
 
 /**
- * It contains the variables that are used as static in the subclasses (except GenericNodeC)
- * of NodeC. For example the locations of the uniforms and the name of the shader.
+ * It contains the locations of the uniforms in the memory
  */
-class Drawing {
-	/**
-	 * Name of the object
-	 * @type {string}
-	 */
-	_name = "";
-	/**
-	 * Vertex array object
-	 */
-	_vao = null;
-	/**
-	 * Number of indices of the object
-	 * @type {number}
-	 */
-	_indicesLength = 0;
-
+class Locations {
 	/**
 	 * Location of the uniform wvpMatrix
 	 */
@@ -113,21 +98,6 @@ class Drawing {
 	 */
 	_f0PersonalLoc = null;
 	/**
-	 * It indicates the metalness of the object
-	 * @type {number}
-	 */
-	_muPersonal = 0.5;
-	/**
-	 * It indicates the roughness of the object
-	 * @type {number}
-	 */
-	_alphaPersonal = 0.2;
-	/**
-	 * F0 value used if the PBR(Physically based rendering) is used
-	 * @type {number}
-	 */
-	_f0Personal = 0.5;
-	/**
 	 * Location of the uniform useTexturesForMuAlpha
 	 */
 	_useTexturesForMuAlphaLoc = null;
@@ -135,21 +105,6 @@ class Drawing {
 	 * Location of the uniform useClassicF0Formula
 	 */
 	_useClassicF0FormulaLoc = null;
-	/**
-	 * Whether to use the textures for the metalness and the roughness of the object
-	 * @type {boolean}
-	 */
-	_useTexturesForMuAlpha = false;
-	/**
-	 * Whether to use the classic F0 formula of PBR or to use a personalized F0
-	 * @type {boolean}
-	 */
-	_useClassicF0Formula = false;
-	/**
-	 * Whether to use one texture for the normal vectors to the surface of the object
-	 * @type {boolean}
-	 */
-	_useNormalTexture = false;
 	/**
 	 * Location of the uniform useNormalTexture
 	 */
@@ -213,6 +168,61 @@ class Drawing {
 	 * Location of the uniform isNight
 	 */
 	_isNightLoc = false;
+
+	/**
+	 * Constructor of Locations. It creates an object with the default values as attributes
+	 */
+	constructor() {
+	}
+}
+
+/**
+ * It contains the variables that are used as static in the subclasses (except GenericNodeC)
+ * of NodeC. For example the vertex array object.
+ */
+class Drawing {
+	/**
+	 * Vertex array object
+	 */
+	_vao = null;
+	/**
+	 * Number of indices of the object
+	 * @type {number}
+	 */
+	_indicesLength = 0;
+
+	/**
+	 * It indicates the metalness of the object
+	 * @type {number}
+	 */
+	_muPersonal = 0.5;
+	/**
+	 * It indicates the roughness of the object
+	 * @type {number}
+	 */
+	_alphaPersonal = 0.2;
+	/**
+	 * F0 value used if the PBR(Physically based rendering) is used
+	 * @type {number}
+	 */
+	_f0Personal = 0.5;
+
+	/**
+	 * Whether to use the textures for the metalness and the roughness of the object
+	 * @type {boolean}
+	 */
+	_useTexturesForMuAlpha = false;
+	/**
+	 * Whether to use the classic F0 formula of PBR or to use a personalized F0
+	 * @type {boolean}
+	 */
+	_useClassicF0Formula = false;
+	/**
+	 * Whether to use one texture for the normal vectors to the surface of the object
+	 * @type {boolean}
+	 */
+	_useNormalTexture = false;
+
 	/**
 	 * Type of the shader
 	 * @type {ShadersType}
@@ -358,21 +368,6 @@ class NodeC {
 	}
 
 
-	/**
-	 * It returns the name
-	 * @returns {string} name
-	 */
-	getName() {
-		return classT(this)._drawing._name;
-	}
-
-	/**
-	 * It sets the name with the given one
-	 * @param name new name
-	 */
-	setName(name) {
-		classT(this)._drawing._name = name;
-	}
 
 
 	/**
@@ -420,7 +415,7 @@ class NodeC {
 	 * @returns wvpMatrixLocation
 	 */
 	getWvpMatrixLocation() {
-		return classT(this)._drawing._wvpMatrixLocation;
+		return this.getShadersType().locations._wvpMatrixLocation;
 	}
 
 
@@ -429,7 +424,7 @@ class NodeC {
 	 * @param wvpMatrixLocation new wvpMatrix' location
 	 */
 	setWvpMatrixLocation(wvpMatrixLocation) {
-		classT(this)._drawing._wvpMatrixLocation = wvpMatrixLocation;
+		this.getShadersType().locations._wvpMatrixLocation = wvpMatrixLocation;
 	}
 
 	/**
@@ -437,7 +432,7 @@ class NodeC {
 	 * @returns normalMatrixLocation
 	 */
 	getNormalMatrixLocation() {
-		return classT(this)._drawing._normalMatrixLocation;
+		return this.getShadersType().locations._normalMatrixLocation;
 	}
 
 	/**
@@ -445,7 +440,7 @@ class NodeC {
 	 * @param normalMatrixLocation new normalMatrix' location
 	 */
 	setNormalMatrixLocation(normalMatrixLocation) {
-		classT(this)._drawing._normalMatrixLocation = normalMatrixLocation;
+		this.getShadersType().locations._normalMatrixLocation = normalMatrixLocation;
 	}
 
 	/**
@@ -453,7 +448,7 @@ class NodeC {
 	 * @returns mDiffColorLoc
 	 */
 	getMDiffColorLoc() {
-		return classT(this)._drawing._mDiffColorLoc;
+		return this.getShadersType().locations._drawing._mDiffColorLoc;
 	}
 
 	/**
@@ -461,7 +456,7 @@ class NodeC {
 	 * @param mDiffColorLoc new location of the mDiff uniform
 	 */
 	setMDiffColorLoc(mDiffColorLoc) {
-		classT(this)._drawing._mDiffColorLoc = mDiffColorLoc;
+		this.getShadersType().locations._mDiffColorLoc = mDiffColorLoc;
 	}
 
 	/**
@@ -469,7 +464,7 @@ class NodeC {
 	 * @returns lightDirectionLoc
 	 */
 	getLightDirectionLoc() {
-		return classT(this)._drawing._lightDirectionLoc;
+		return this.getShadersType().locations._lightDirectionLoc;
 	}
 
 	/**
@@ -477,7 +472,7 @@ class NodeC {
 	 * @param lightDirectionLoc new lightDirection's location
 	 */
 	setLightDirectionLoc(lightDirectionLoc) {
-		classT(this)._drawing._lightDirectionLoc = lightDirectionLoc;
+		this.getShadersType().locations._lightDirectionLoc = lightDirectionLoc;
 	}
 
 	/**
@@ -485,7 +480,7 @@ class NodeC {
 	 * @returns lightColorLoc
 	 */
 	getLightColorLoc() {
-		return classT(this)._drawing._lightColorLoc;
+		return this.getShadersType().locations._lightColorLoc;
 	}
 
 	/**
@@ -493,7 +488,7 @@ class NodeC {
 	 * @param lightColorLoc new lightColorLoc
 	 */
 	setLightColorLoc(lightColorLoc) {
-		classT(this)._drawing._lightColorLoc = lightColorLoc;
+		this.getShadersType().locations._lightColorLoc = lightColorLoc;
 	}
 
 	/**
@@ -501,7 +496,7 @@ class NodeC {
 	 * @returns wvMatrixLocation
 	 */
 	getWvMatrixLocation() {
-		return classT(this)._drawing._wvMatrixLocation;
+		return this.getShadersType().locations._wvMatrixLocation;
 	}
 
 	/**
@@ -509,7 +504,7 @@ class NodeC {
 	 * @param wvMatrixLocation new wvMatrixLocation
 	 */
 	setWvMatrixLocation(wvMatrixLocation) {
-		classT(this)._drawing._wvMatrixLocation = wvMatrixLocation;
+		this.getShadersType().locations._wvMatrixLocation = wvMatrixLocation;
 	}
 
 	/**
@@ -517,7 +512,7 @@ class NodeC {
 	 * @returns muLocation
 	 */
 	getMuLocation() {
-		return classT(this)._drawing._muLocation;
+		return this.getShadersType().locations._drawing._muLocation;
 	}
 
 	/**
@@ -525,7 +520,7 @@ class NodeC {
 	 * @param muLocation new muLocation
 	 */
 	setMuLocation(muLocation) {
-		classT(this)._drawing._muLocation = muLocation;
+		this.getShadersType().locations._muLocation = muLocation;
 	}
 
 	/**
@@ -533,7 +528,7 @@ class NodeC {
 	 * @returns alphaLocation
 	 */
 	getAlphaLocation() {
-		return classT(this)._drawing._alphaLocation;
+		return this.getShadersType().locations._alphaLocation;
 	}
 
 	/**
@@ -541,7 +536,7 @@ class NodeC {
 	 * @param alphaLocation new alphaLocation
 	 */
 	setAlphaLocation(alphaLocation) {
-		classT(this)._drawing._alphaLocation = alphaLocation;
+		this.getShadersType().locations._alphaLocation = alphaLocation;
 	}
 
 	/**
@@ -549,7 +544,7 @@ class NodeC {
 	 * @returns invViewProjMatrixLoc
 	 */
 	getInvViewProjMatrixLoc() {
-		return classT(this)._drawing._invViewProjMatrixLoc;
+		return this.getShadersType().locations._invViewProjMatrixLoc;
 	}
 
 	/**
@@ -557,7 +552,7 @@ class NodeC {
 	 * @param invViewProjMatrixLoc new invViewProjMatrixLoc
 	 */
 	setInvViewProjMatrixLoc(invViewProjMatrixLoc) {
-		classT(this)._drawing._invViewProjMatrixLoc = invViewProjMatrixLoc;
+		this.getShadersType().locations._invViewProjMatrixLoc = invViewProjMatrixLoc;
 	}
 
 	/**
@@ -626,7 +621,7 @@ class NodeC {
 	 * @returns albedoTextureLoc
 	 */
 	getAlbedoTextureLoc() {
-		return classT(this)._drawing._albedoTextureLoc;
+		return this.getShadersType().locations._albedoTextureLoc;
 	}
 
 	/**
@@ -634,7 +629,7 @@ class NodeC {
 	 * @param albedoTextureLoc new albedoTextureLoc
 	 */
 	setAlbedoTextureLoc(albedoTextureLoc) {
-		classT(this)._drawing._albedoTextureLoc = albedoTextureLoc;
+		this.getShadersType().locations._albedoTextureLoc = albedoTextureLoc;
 	}
 
 	/**
@@ -642,7 +637,7 @@ class NodeC {
 	 * @returns normalTextureLoc
 	 */
 	getNormalTextureLoc() {
-		return classT(this)._drawing._normalTextureLoc;
+		return this.getShadersType().locations._normalTextureLoc;
 	}
 
 	/**
@@ -650,7 +645,7 @@ class NodeC {
 	 * @param normalTextureLoc new normalTextureLoc
 	 */
 	setNormalTextureLoc(normalTextureLoc) {
-		classT(this)._drawing._normalTextureLoc = normalTextureLoc;
+		this.getShadersType().locations._normalTextureLoc = normalTextureLoc;
 	}
 
 	/**
@@ -658,7 +653,7 @@ class NodeC {
 	 * @returns muTextureLoc
 	 */
 	getMuTextureLoc() {
-		return classT(this)._drawing._muTextureLoc;
+		return this.getShadersType().locations._muTextureLoc;
 	}
 
 	/**
@@ -666,7 +661,7 @@ class NodeC {
 	 * @param muTextureLoc new muTextureLoc
 	 */
 	setMuTextureLoc(muTextureLoc) {
-		classT(this)._drawing._muTextureLoc = muTextureLoc;
+		this.getShadersType().locations._muTextureLoc = muTextureLoc;
 	}
 
 	/**
@@ -674,7 +669,7 @@ class NodeC {
 	 * @returns alphaTextureLoc
 	 */
 	getAlphaTextureLoc() {
-		return classT(this)._drawing._alphaTextureLoc;
+		return this.getShadersType().locations._alphaTextureLoc;
 	}
 
 	/**
@@ -682,7 +677,7 @@ class NodeC {
 	 * @param alphaTextureLoc new alphaTextureLoc
 	 */
 	setAlphaTextureLoc(alphaTextureLoc) {
-		classT(this)._drawing._alphaTextureLoc = alphaTextureLoc;
+		this.getShadersType().locations._alphaTextureLoc = alphaTextureLoc;
 	}
 
 	/**
@@ -690,7 +685,7 @@ class NodeC {
 	 * @returns hemiLightUpperLoc
 	 */
 	getHemiLightUpperLoc() {
-		return classT(this)._drawing._hemiLightUpperLoc;
+		return this.getShadersType().locations._hemiLightUpperLoc;
 	}
 
 	/**
@@ -698,7 +693,7 @@ class NodeC {
 	 * @param hemiLightUpperLoc new hemiLightUpperLoc
 	 */
 	setHemiLightUpperLoc(hemiLightUpperLoc) {
-		classT(this)._drawing._hemiLightUpperLoc = hemiLightUpperLoc;
+		this.getShadersType().locations._hemiLightUpperLoc = hemiLightUpperLoc;
 	}
 
 	/**
@@ -706,7 +701,7 @@ class NodeC {
 	 * @returns hemiLightLowerLoc
 	 */
 	getHemiLightLowerLoc() {
-		return classT(this)._drawing._hemiLightLowerLoc;
+		return this.getShadersType().locations._hemiLightLowerLoc;
 	}
 
 	/**
@@ -714,7 +709,7 @@ class NodeC {
 	 * @param hemiLightLowerLoc new hemiLightLowerLoc
 	 */
 	setHemiLightLowerLoc(hemiLightLowerLoc) {
-		classT(this)._drawing._hemiLightLowerLoc = hemiLightLowerLoc;
+		this.getShadersType().locations._hemiLightLowerLoc = hemiLightLowerLoc;
 	}
 
 	/**
@@ -722,7 +717,7 @@ class NodeC {
 	 * @returns hemisphericDLoc
 	 */
 	getHemisphericDLoc() {
-		return classT(this)._drawing._hemisphericDLoc;
+		return this.getShadersType().locations._hemisphericDLoc;
 	}
 
 	/**
@@ -730,7 +725,7 @@ class NodeC {
 	 * @param hemisphericDLoc new hemisphericDLoc
 	 */
 	setHemisphericDLoc(hemisphericDLoc) {
-		classT(this)._drawing._hemisphericDLoc = hemisphericDLoc;
+		this.getShadersType().locations._hemisphericDLoc = hemisphericDLoc;
 	}
 
 	/**
@@ -738,7 +733,7 @@ class NodeC {
 	 * @returns muPersonalLoc
 	 */
 	getMuPersonalLoc() {
-		return classT(this)._drawing._muPersonalLoc;
+		return this.getShadersType().locations._muPersonalLoc;
 	}
 
 	/**
@@ -746,7 +741,7 @@ class NodeC {
 	 * @param muPersonalLoc new muPersonalLoc
 	 */
 	setMuPersonalLoc(muPersonalLoc) {
-		classT(this)._drawing._muPersonalLoc = muPersonalLoc;
+		this.getShadersType().locations._muPersonalLoc = muPersonalLoc;
 	}
 
 	/**
@@ -754,7 +749,7 @@ class NodeC {
 	 * @returns alphaPersonalLoc
 	 */
 	getAlphaPersonalLoc() {
-		return classT(this)._drawing._alphaPersonalLoc;
+		return this.getShadersType().locations._alphaPersonalLoc;
 	}
 
 	/**
@@ -762,7 +757,7 @@ class NodeC {
 	 * @param alphaPersonalLoc new alphaPersonalLoc
 	 */
 	setAlphaPersonalLoc(alphaPersonalLoc) {
-		classT(this)._drawing._alphaPersonalLoc = alphaPersonalLoc;
+		this.getShadersType().locations._alphaPersonalLoc = alphaPersonalLoc;
 	}
 
 	/**
@@ -770,7 +765,7 @@ class NodeC {
 	 * @returns f0PersonalLoc
 	 */
 	getF0PersonalLoc() {
-		return classT(this)._drawing._f0PersonalLoc;
+		return this.getShadersType().locations._f0PersonalLoc;
 	}
 
 	/**
@@ -778,7 +773,7 @@ class NodeC {
 	 * @param f0PersonalLoc new f0PersonalLoc
 	 */
 	setF0PersonalLoc(f0PersonalLoc) {
-		classT(this)._drawing._f0PersonalLoc = f0PersonalLoc;
+		this.getShadersType().locations._f0PersonalLoc = f0PersonalLoc;
 	}
 
 	/**
@@ -834,7 +829,7 @@ class NodeC {
 	 * @returns useTexturesForMuAlphaLoc
 	 */
 	getUseTexturesForMuAlphaLoc() {
-		return classT(this)._drawing._useTexturesForMuAlphaLoc;
+		return this.getShadersType().locations._useTexturesForMuAlphaLoc;
 	}
 
 	/**
@@ -842,7 +837,7 @@ class NodeC {
 	 * @param useTexturesForMuAlphaLoc new useTexturesForMuAlphaLoc
 	 */
 	setUseTexturesForMuAlphaLoc(useTexturesForMuAlphaLoc) {
-		classT(this)._drawing._useTexturesForMuAlphaLoc = useTexturesForMuAlphaLoc;
+		this.getShadersType().locations._useTexturesForMuAlphaLoc = useTexturesForMuAlphaLoc;
 	}
 
 	/**
@@ -866,7 +861,7 @@ class NodeC {
 	 * @returns useClassicF0FormulaLoc
 	 */
 	getUseClassicF0FormulaLoc() {
-		return classT(this)._drawing._useClassicF0FormulaLoc;
+		return this.getShadersType().locations._useClassicF0FormulaLoc;
 	}
 
 	/**
@@ -874,7 +869,7 @@ class NodeC {
 	 * @param useClassicF0FormulaLoc new useClassicF0FormulaLoc
 	 */
 	setUseClassicF0FormulaLoc(useClassicF0FormulaLoc) {
-		classT(this)._drawing._useClassicF0FormulaLoc = useClassicF0FormulaLoc;
+		this.getShadersType().locations._useClassicF0FormulaLoc = useClassicF0FormulaLoc;
 	}
 
 	/**
@@ -914,7 +909,7 @@ class NodeC {
 	 * @returns useNormalTextureLoc
 	 */
 	getUseNormalTextureLoc() {
-		return classT(this)._drawing._useNormalTextureLoc;
+		return this.getShadersType().locations._useNormalTextureLoc;
 	}
 
 	/**
@@ -922,7 +917,7 @@ class NodeC {
 	 * @param useNormalTextureLoc new useNormalTextureLoc
 	 */
 	setUseNormalTextureLoc(useNormalTextureLoc) {
-		classT(this)._drawing._useNormalTextureLoc = useNormalTextureLoc;
+		this.getShadersType().locations._useNormalTextureLoc = useNormalTextureLoc;
 	}
 
 	/**
@@ -930,7 +925,7 @@ class NodeC {
 	 * @returns pl1ColorLoc
 	 */
 	getPl1ColorLoc() {
-		return classT(this)._drawing._pl1ColorLoc;
+		return this.getShadersType().locations._pl1ColorLoc;
 	}
 
 	/**
@@ -938,7 +933,7 @@ class NodeC {
 	 * @param pl1ColorLoc new pl1ColorLoc
 	 */
 	setPl1ColorLoc(pl1ColorLoc) {
-		classT(this)._drawing._pl1ColorLoc = pl1ColorLoc;
+		this.getShadersType().locations._pl1ColorLoc = pl1ColorLoc;
 	}
 
 	/**
@@ -946,7 +941,7 @@ class NodeC {
 	 * @returns pl1PosLoc
 	 */
 	getPl1PosLoc() {
-		return classT(this)._drawing._pl1PosLoc;
+		return this.getShadersType().locations._pl1PosLoc;
 	}
 
 	/**
@@ -954,7 +949,7 @@ class NodeC {
 	 * @param pl1PosLoc new pl1PosLoc
 	 */
 	setPl1PosLoc(pl1PosLoc) {
-		classT(this)._drawing._pl1PosLoc = pl1PosLoc;
+		this.getShadersType().locations._pl1PosLoc = pl1PosLoc;
 	}
 
 	/**
@@ -962,7 +957,7 @@ class NodeC {
 	 * @returns pl2ColorLoc
 	 */
 	getPl2ColorLoc() {
-		return classT(this)._drawing._pl2ColorLoc;
+		return this.getShadersType().locations._pl2ColorLoc;
 	}
 
 	/**
@@ -970,7 +965,7 @@ class NodeC {
 	 * @param pl2ColorLoc new pl2ColorLoc
 	 */
 	setPl2ColorLoc(pl2ColorLoc) {
-		classT(this)._drawing._pl2ColorLoc = pl2ColorLoc;
+		this.getShadersType().locations._pl2ColorLoc = pl2ColorLoc;
 	}
 
 	/**
@@ -978,7 +973,7 @@ class NodeC {
 	 * @returns pl2PosLoc
 	 */
 	getPl2PosLoc() {
-		return classT(this)._drawing._pl2PosLoc;
+		return this.getShadersType().locations._pl2PosLoc;
 	}
 
 	/**
@@ -986,7 +981,7 @@ class NodeC {
 	 * @param pl2PosLoc new pl2PosLoc
 	 */
 	setPl2PosLoc(pl2PosLoc) {
-		classT(this)._drawing._pl2PosLoc = pl2PosLoc;
+		this.getShadersType().locations._pl2PosLoc = pl2PosLoc;
 	}
 
 	/**
@@ -994,7 +989,7 @@ class NodeC {
 	 * @returns plTargetLoc
 	 */
 	getPlTargetLoc() {
-		return classT(this)._drawing._plTargetLoc;
+		return this.getShadersType().locations._plTargetLoc;
 	}
 
 	/**
@@ -1002,7 +997,7 @@ class NodeC {
 	 * @param plTargetLoc new plTargetLoc
 	 */
 	setPlTargetLoc(plTargetLoc) {
-		classT(this)._drawing._plTargetLoc = plTargetLoc;
+		this.getShadersType().locations._plTargetLoc = plTargetLoc;
 	}
 
 	/**
@@ -1010,7 +1005,7 @@ class NodeC {
 	 * @returns plDecayLoc
 	 */
 	getPlDecayLoc() {
-		return classT(this)._drawing._plDecayLoc;
+		return this.getShadersType().locations._plDecayLoc;
 	}
 
 	/**
@@ -1018,7 +1013,7 @@ class NodeC {
 	 * @param plDecayLoc new plDecayLoc
 	 */
 	setPlDecayLoc(plDecayLoc) {
-		classT(this)._drawing._plDecayLoc = plDecayLoc;
+		this.getShadersType().locations._plDecayLoc = plDecayLoc;
 	}
 
 	/**
@@ -1026,7 +1021,7 @@ class NodeC {
 	 * @returns spotlColorLoc
 	 */
 	getSpotlColorLoc() {
-		return classT(this)._drawing._spotlColorLoc;
+		return this.getShadersType().locations._spotlColorLoc;
 	}
 
 	/**
@@ -1034,7 +1029,7 @@ class NodeC {
 	 * @param spotlColorLoc new spotlColorLoc
 	 */
 	setSpotlColorLoc(spotlColorLoc) {
-		classT(this)._drawing._spotlColorLoc = spotlColorLoc;
+		this.getShadersType().locations._spotlColorLoc = spotlColorLoc;
 	}
 
 	/**
@@ -1042,7 +1037,7 @@ class NodeC {
 	 * @returns spotPosLoc
 	 */
 	getSpotPosLoc() {
-		return classT(this)._drawing._spotPosLoc;
+		return this.getShadersType().locations._spotPosLoc;
 	}
 
 	/**
@@ -1050,7 +1045,7 @@ class NodeC {
 	 * @param spotPosLoc new spotPosLoc
 	 */
 	setSpotPosLoc(spotPosLoc) {
-		classT(this)._drawing._spotPosLoc = spotPosLoc;
+		this.getShadersType().locations._spotPosLoc = spotPosLoc;
 	}
 
 	/**
@@ -1058,7 +1053,7 @@ class NodeC {
 	 * @returns spotTargetLoc
 	 */
 	getSpotTargetLoc() {
-		return classT(this)._drawing._spotTargetLoc;
+		return this.getShadersType().locations._spotTargetLoc;
 	}
 
 	/**
@@ -1066,7 +1061,7 @@ class NodeC {
 	 * @param spotTargetLoc new spotTargetLoc
 	 */
 	setSpotTargetLoc(spotTargetLoc) {
-		classT(this)._drawing._spotTargetLoc = spotTargetLoc;
+		this.getShadersType().locations._spotTargetLoc = spotTargetLoc;
 	}
 
 	/**
@@ -1074,7 +1069,7 @@ class NodeC {
 	 * @returns spotDecayLoc
 	 */
 	getSpotDecayLoc() {
-		return classT(this)._drawing._spotDecayLoc;
+		return this.getShadersType().locations._spotDecayLoc;
 	}
 
 	/**
@@ -1082,7 +1077,7 @@ class NodeC {
 	 * @param spotDecayLoc new spotDecayLoc
 	 */
 	setSpotDecayLoc(spotDecayLoc) {
-		classT(this)._drawing._spotDecayLoc = spotDecayLoc;
+		this.getShadersType().locations._spotDecayLoc = spotDecayLoc;
 	}
 
 	/**
@@ -1090,7 +1085,7 @@ class NodeC {
 	 * @returns spotConeInLoc
 	 */
 	getSpotConeInLoc() {
-		return classT(this)._drawing._spotConeInLoc;
+		return this.getShadersType().locations._spotConeInLoc;
 	}
 
 	/**
@@ -1098,7 +1093,7 @@ class NodeC {
 	 * @param spotConeInLoc new spotConeInLoc
 	 */
 	setSpotConeInLoc(spotConeInLoc) {
-		classT(this)._drawing._spotConeInLoc = spotConeInLoc;
+		this.getShadersType().locations._spotConeInLoc = spotConeInLoc;
 	}
 
 	/**
@@ -1106,7 +1101,7 @@ class NodeC {
 	 * @returns spotConeOutLoc
 	 */
 	getSpotConeOutLoc() {
-		return classT(this)._drawing._spotConeOutLoc;
+		return this.getShadersType().locations._spotConeOutLoc;
 	}
 
 	/**
@@ -1114,7 +1109,7 @@ class NodeC {
 	 * @param spotConeOutLoc new spotConeOutLoc
 	 */
 	setSpotConeOutLoc(spotConeOutLoc) {
-		classT(this)._drawing._spotConeOutLoc = spotConeOutLoc;
+		this.getShadersType().locations._spotConeOutLoc = spotConeOutLoc;
 	}
 
 	/**
@@ -1122,7 +1117,7 @@ class NodeC {
 	 * @returns isNightLoc
 	 */
 	getIsNightLoc() {
-		return classT(this)._drawing._isNightLoc;
+		return this.getShadersType().locations._isNightLoc;
 	}
 
 	/**
@@ -1130,7 +1125,7 @@ class NodeC {
 	 * @param isNightLoc new isNightLoc
 	 */
 	setIsNightLoc(isNightLoc) {
-		classT(this)._drawing._isNightLoc = isNightLoc;
+		this.getShadersType().locations._isNightLoc = isNightLoc;
 	}
 
 	/**
@@ -1138,7 +1133,7 @@ class NodeC {
 	 * @returns spotDirectionLoc
 	 */
 	getSpotDirectionLoc() {
-		return classT(this)._drawing._spotDirectionLoc;
+		return this.getShadersType().locations._spotDirectionLoc;
 	}
 
 	/**
@@ -1146,7 +1141,7 @@ class NodeC {
 	 * @param spotDirectionLoc new spotDirectionLoc
 	 */
 	setSpotDirectionLoc(spotDirectionLoc) {
-		classT(this)._drawing._spotDirectionLoc = spotDirectionLoc;
+		this.getShadersType().locations._spotDirectionLoc = spotDirectionLoc;
 	}
 
 	/**
@@ -1594,22 +1589,6 @@ class GenericNodeC extends NodeC {
 	}
 
 
-
-	/**
-	 * It returns the name
-	 * @returns {string} name
-	 */
-	getName() {
-		return this._drawing._name;
-	}
-
-	/**
-	 * It sets the name with the given one
-	 * @param name new name
-	 */
-	setName(name) {
-		this._drawing._name = name;
-	}
 
 
 	/**
