@@ -1,14 +1,14 @@
 
-mjavascript:S2814²
-"DRename "i" as this name is already used in declaration at line 1313.(»Ì¼Åşÿÿÿÿ8ªÍÈÓ¨/
-gjavascript:S2814¤"CRename "j" as this name is already used in declaration at line 879.(µñÊó8”ñ¢ˆ¨/
-gjavascript:S2814•"CRename "j" as this name is already used in declaration at line 879.(µñÊó8”ñ¢ˆ¨/
-b'javascript:FunctionDefinitionInsideLoop"'Define this function outside of a loop.(¹±Ç‘8”ñ¢ˆ¨/
-fjavascript:S2814‡"CRename "i" as this name is already used in declaration at line 878.(ÒÃ‹
+b'javascript:FunctionDefinitionInsideLoop‹"'Define this function outside of a loop.(¹±Ç‘8”ñ¢ˆ¨/
+gjavascript:S2814÷"CRename "j" as this name is already used in declaration at line 862.(µñÊó8”ñ¢ˆ¨/
+fjavascript:S2814ö"CRename "i" as this name is already used in declaration at line 861.(ÒÃ‹
 8ç¢ˆ¨/
-gjavascript:S2814ˆ"CRename "j" as this name is already used in declaration at line 879.(µñÊó8”ñ¢ˆ¨/
-fjavascript:S2814”"CRename "i" as this name is already used in declaration at line 878.(ÒÃ‹
+fjavascript:S2814’"CRename "i" as this name is already used in declaration at line 861.(ÒÃ‹
 8ç¢ˆ¨/
-fjavascript:S2814£"CRename "i" as this name is already used in declaration at line 878.(ÒÃ‹
+mjavascript:S2814¡
+"DRename "i" as this name is already used in declaration at line 1296.(»Ì¼Åşÿÿÿÿ8ªÍÈÓ¨/
+ˆjavascript:S2703"_Add the "let", "const" or "var" keyword to this declaration of "addSounds" to make it explicit.(¢¹„òşÿÿÿÿ8ÍÅÁï«/
+fjavascript:S2814ƒ"CRename "i" as this name is already used in declaration at line 861.(ÒÃ‹
 8ç¢ˆ¨/
-ˆjavascript:S2703È"_Add the "let", "const" or "var" keyword to this declaration of "addSounds" to make it explicit.(¢¹„òşÿÿÿÿ8¸í®ƒ©/
+gjavascript:S2814„"CRename "j" as this name is already used in declaration at line 862.(µñÊó8”ñ¢ˆ¨/
+gjavascript:S2814“"CRename "j" as this name is already used in declaration at line 862.(µñÊó8”ñ¢ˆ¨/

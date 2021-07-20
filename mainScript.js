@@ -461,7 +461,8 @@ function setBirdPosition() {
 }
 
 /**
- * It creates the nodes of the scene
+ * It creates the scene graph by instantiating the nodes, which in most of the cases represents
+ * objects in the scene.
  */
 function createNodes() {
 	rootNode = new BaseNodeC();
@@ -477,7 +478,7 @@ function createNodes() {
 	skyMapNode.setParent(rootNode);
 	objectsWithShaders.push(skyMapNode);
 
-	birdNode = new BirdNodeC();
+	birdNode = new SceneNodeC(SceneNodeType.bird);
 	birdNode.setShadersType(ShadersType.pbr);
 	birdNode.setParent(rootNode);
 	setBirdPosition();
@@ -651,7 +652,7 @@ function setNode(node, position, shaderType) {
  * @param position position of the node
  */
 function createSpruceNode(position) {
-	setNode(new SpruceNodeC(), position, ShadersType.pbr);
+	setNode(new SceneNodeC(SceneNodeType.spruce), position, ShadersType.pbr);
 }
 
 /**
@@ -659,7 +660,7 @@ function createSpruceNode(position) {
  * @param position position of the node
  */
 function createDeadTreeNode(position) {
-	setNode(new DeadTreeNodeC(), position, ShadersType.pbr);
+	setNode(new SceneNodeC(SceneNodeType.deadTree), position, ShadersType.pbr);
 }
 
 /**
@@ -667,7 +668,7 @@ function createDeadTreeNode(position) {
  * @param position position of the node
  */
 function createCircularSpruceNode(position) {
-	setNode(new CircularSpruceNodeC(), position, ShadersType.phong);
+	setNode(new SceneNodeC(SceneNodeType.circularSpruce), position, ShadersType.phong);
 }
 
 /**
@@ -675,7 +676,7 @@ function createCircularSpruceNode(position) {
  * @param position position of the node
  */
 function createMaritimePineNode(position) {
-	setNode(new MaritimePineNodeC(), position, ShadersType.blinn);
+	setNode(new SceneNodeC(SceneNodeType.maritimePine), position, ShadersType.blinn);
 }
 
 /**
@@ -683,7 +684,7 @@ function createMaritimePineNode(position) {
  * @param position position of the node
  */
 function createStumpNode(position) {
-	setNode(new StumpNodeC(), position, ShadersType.orenNayar);
+	setNode(new SceneNodeC(SceneNodeType.stump), position, ShadersType.orenNayar);
 }
 
 /**
@@ -691,7 +692,7 @@ function createStumpNode(position) {
  * @param position position of the node
  */
 function createFlowerNode(position) {
-	setNode(new FlowerNodeC(), position, ShadersType.pbr);
+	setNode(new SceneNodeC(SceneNodeType.flower), position, ShadersType.pbr);
 }
 
 /**
@@ -699,7 +700,7 @@ function createFlowerNode(position) {
  * @param position position of the node
  */
 function createPlantNode(position) {
-	setNode(new PlantNodeC(), position, ShadersType.pbr);
+	setNode(new SceneNodeC(SceneNodeType.plant), position, ShadersType.pbr);
 }
 
 /**
@@ -707,7 +708,7 @@ function createPlantNode(position) {
  * @param position position of the node
  */
 function createRock1(position) {
-	setNode(new Rock1NodeC(), position, ShadersType.pbr);
+	setNode(new SceneNodeC(SceneNodeType.rock1), position, ShadersType.pbr);
 }
 
 /**
@@ -715,7 +716,7 @@ function createRock1(position) {
  * @param position position of the node
  */
 function createRock2(position) {
-	setNode(new Rock2NodeC(), position, ShadersType.pbr);
+	setNode(new SceneNodeC(SceneNodeType.rock2), position, ShadersType.pbr);
 }
 
 /**
@@ -723,7 +724,7 @@ function createRock2(position) {
  * @param position position of the node
  */
 function createRock3(position) {
-	setNode(new Rock3NodeC(), position, ShadersType.pbr);
+	setNode(new SceneNodeC(SceneNodeType.rock3), position, ShadersType.pbr);
 }
 
 /**
@@ -731,7 +732,7 @@ function createRock3(position) {
  * @param position position of the node
  */
 function createSmallrock(position) {
-	setNode(new SmallrockNodeC(), position, ShadersType.pbr);
+	setNode(new SceneNodeC(SceneNodeType.smallrock), position, ShadersType.pbr);
 }
 
 /**
@@ -740,7 +741,7 @@ function createSmallrock(position) {
  * @param scaling scaling of the node
  */
 function createRock3Scaled(position, scaling) {
-	const node = new Rock3NodeC();
+	const node = new SceneNodeC(SceneNodeType.rock3);
 	node.setScaling(scaling);
 	setNode(node, position, ShadersType.pbr);
 }
@@ -750,7 +751,10 @@ function createRock3Scaled(position, scaling) {
  * @param position position of the node
  */
 function createSign(position) {
-	setNode(new SignNodeC(), position, ShadersType.pbr);
+	const node = new SceneNodeC(SceneNodeType.sign);
+	node.setScaling([0.282, 0.282, 0.282]);
+	node.setRotation([0, 90, 0]);
+	setNode(node, position, ShadersType.pbr);
 }
 
 /**
@@ -758,7 +762,7 @@ function createSign(position) {
  * @param position position of the node
  */
 function createBladesObject(position) {
-	const node = setNode(new BladesNodeC(), position, ShadersType.pbr);
+	const node = setNode(new SceneNodeC(SceneNodeType.blades), position, ShadersType.pbr);
 	objectsThatHurts.push(node);
 }
 
@@ -933,7 +937,7 @@ async function createField() {
 	fieldNode.setLocalMatrix(utils.identityMatrix());
 
 	const COLLISION_HEIGHT = 1;
-	fieldNode.setCollisionOject(new ParallelepipedCollision([0, -COLLISION_HEIGHT, 0], FIELD_RANGE, COLLISION_HEIGHT, FIELD_RANGE));
+	fieldNode.setCollisionObject(new ParallelepipedCollision([0, -COLLISION_HEIGHT, 0], FIELD_RANGE, COLLISION_HEIGHT, FIELD_RANGE));
 	
 	await NodeC.createAndloadDataOnGPUForNode(fieldNode, vertices, uv, normals, indices,
 		0.55, 0.3, 0.5, false, true, "stylized-grass1", ".png", true);
@@ -1382,7 +1386,7 @@ function animateLight() {
 	if(lastUpdateTime) {
 		const time = (currentTime-firstTime);
 		const millisecondsPerSecond = 1000;
-		const secondsPerPiece = 15; //60
+		const secondsPerPiece = 100;
 		const piecesPerRound = 4;
 		const angle = 2*Math.PI*(time/millisecondsPerSecond)/secondsPerPiece/piecesPerRound;
 

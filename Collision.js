@@ -51,8 +51,7 @@ class Collision {
 	 * @returns {Collision} copy of this object
 	 */
 	copy() {
-		const collision = new Collision();
-		return collision;
+		return new Collision();
 	}
 
 	/**
@@ -135,6 +134,21 @@ class Collision {
 		return true;
 	}
 
+	/**
+	 * It sets the position of the center of this object with the given one.
+	 * @param position position of the center, that is used to set the position
+	 * of the center of this object.
+	 */
+	setPosition(position) {
+	}
+
+	/**
+	 * It scales this collision object with the given parameter
+	 * @param scaling scaling parameter
+	 */
+	setScaling(scaling) {
+	}
+
 }
 
 /**
@@ -154,8 +168,7 @@ class NoCollision extends Collision {
 	 * @returns {Collision} copy of this object
 	 */
 	copy() {
-		const collision = new NoCollision();
-		return collision;
+		return new NoCollision();
 	}
 
 	/**
@@ -276,7 +289,9 @@ class SphereCollision extends Collision {
 	 */
 	constructor(sphereCentre, sphereRadius) {
 		super();
-		this._position = otherUtils.copyArray(sphereCentre);
+		if(sphereCentre!=null) {
+			this._position = otherUtils.copyArray(sphereCentre);
+		}
 		this._radius = sphereRadius;
 	}
 
@@ -294,10 +309,7 @@ class SphereCollision extends Collision {
 	 * @returns {Collision} copy of this object.
 	 */
 	copy() {
-		const collision = new Collision();
-		collision._sphereCentre = otherUtils.copy(this._position);
-		collision._sphereRadius = this._radius;
-		return collision;
+		return new SphereCollision(otherUtils.copyArray(this._position), this._radius);
 	}
 
 	/**
@@ -606,6 +618,14 @@ class SphereCollision extends Collision {
 		return false;
 	}
 
+	/**
+	 * It scales this collision object with the given parameter
+	 * @param scaling scaling parameter
+	 */
+	setScaling(scaling) {
+		this._radius = this._radius*scaling[0];
+	}
+
 }
 
 /**
@@ -640,9 +660,20 @@ class CylinderCollision extends Collision {
 	 */
 	constructor(position, radius, height) {
 		super();
-		this._position = otherUtils.copyArray(position);
+		if(position!=null) {
+			this._position = otherUtils.copyArray(position);
+		}
 		this._radius = radius;
 		this._height = height;
+	}
+
+	/**
+	 * It sets the position of the center of this object with the given one.
+	 * @param position position of the center, that is used to set the position
+	 * of the center of this object.
+	 */
+	setPosition(position) {
+		this._position = otherUtils.copyArray(position);
 	}
 
 	/**
@@ -650,11 +681,7 @@ class CylinderCollision extends Collision {
 	 * @returns {Collision} copy of this object.
 	 */
 	copy() {
-		const collision = new Collision();
-		collision._position = otherUtils.copy(this._position);
-		collision._radius = this._radius;
-		collision._height = this._height;
-		return collision;
+		return new CylinderCollision(otherUtils.copyArray(this._position), this._radius, this._height);
 	}
 
 	/**
@@ -961,6 +988,14 @@ class CylinderCollision extends Collision {
 		return false;
 	}
 
+	/**
+	 * It scales this collision object with the given parameter
+	 * @param scaling scaling parameter
+	 */
+	setScaling(scaling) {
+		this._radius = this._radius*scaling[0];
+		this._height = this._height*scaling[1];
+	}
 }
 
 /**
@@ -1003,10 +1038,21 @@ class ParallelepipedCollision extends Collision {
 	 */
 	constructor(position, hwidthX, height, hwidthZ) {
 		super();
-		this._position = otherUtils.copyArray(position);
+		if(position!=null) {
+			this._position = otherUtils.copyArray(position);
+		}
 		this._hwidthX = hwidthX;
 		this._height = height;
 		this._hwidthZ = hwidthZ;
+	}
+
+	/**
+	 * It sets the position of the center of this object with the given one.
+	 * @param position position of the center, that is used to set the position
+	 * of the center of this object.
+	 */
+	setPosition(position) {
+		this._position = otherUtils.copyArray(position);
 	}
 
 	/**
@@ -1014,11 +1060,7 @@ class ParallelepipedCollision extends Collision {
 	 * @returns {Collision} copy of this object.
 	 */
 	copy() {
-		const collision = new Collision();
-		collision._position = otherUtils.copy(this._position);
-		collision._hwidthX = this._hwidthX;
-		collision._height = this._height;
-		return collision;
+		return new ParallelepipedCollision(otherUtils.copyArray(this._position), this._hwidthX, this._height, this._hwidthZ);
 	}
 
 	/**
@@ -1453,6 +1495,16 @@ class ParallelepipedCollision extends Collision {
 		}
 
 		return false;
+	}
+
+	/**
+	 * It scales this collision object with the given parameter
+	 * @param scaling scaling parameter
+	 */
+	setScaling(scaling) {
+		this._hwidthX = this._hwidthX*scaling[0];
+		this._height = this._height*scaling[1];
+		this._hwidthZ = this._hwidthZ*scaling[2];
 	}
 
 }

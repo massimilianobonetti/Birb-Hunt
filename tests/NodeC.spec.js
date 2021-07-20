@@ -1,8 +1,8 @@
 TestCase("setParent test", {
     "test setParent name": function() {
         const node = new GenericNodeC();
-        const parent = new StumpNodeC();
-        const newParent = new SpruceNodeC();
+        const parent = new BaseNodeC();
+        const newParent = new SceneNodeC();
         node.setParent(parent);
         node.setParent(newParent);
         assertEquals(node, newParent._children[0]);
@@ -17,10 +17,10 @@ TestCase("setParent test", {
 
 TestCase("updateWorldMatrix test", {
     "test updateWorldMatrix name": function() {
-        const rootNode = new GenericNodeC();
-        const child1 = new FlowerNodeC();
-        const child2 = new StumpNodeC();
-        const nephew = new SpruceNodeC();
+        const rootNode = new BaseNodeC();
+        const child1 = new SceneNodeC();
+        const child2 = new SceneNodeC();
+        const nephew = new SceneNodeC();
         child1.setParent(rootNode);
         child2.setParent(rootNode);
         nephew.setParent(child1);
@@ -82,29 +82,6 @@ TestCase("updateWorldMatrix test", {
     }
 });
 
-TestCase("classT", {
-    //the first name must always be test
-    "test classT SpruceNodeC": function() {
-        const node = new SpruceNodeC();
-        assertEquals(SpruceNodeC, classT(node));
-    },
-
-    "test classT GenericNodeC": function() {
-        const node = new GenericNodeC();
-        assertEquals(GenericNodeC, classT(node));
-    },
-
-    "test classT BirdNodeC": function() {
-        const node = new BirdNodeC();
-        assertEquals(BirdNodeC, classT(node));
-    },
-
-    "test classT StumpNodeC": function() {
-        const node = new StumpNodeC();
-        assertEquals(StumpNodeC, classT(node));
-    }
-});
-
 TestCase("ShadersType test", {
     "test ShadersType name": function() {
         assertEquals("pbrTex", ShadersType.pbr.name);
@@ -135,5 +112,19 @@ TestCase("Texture test", {
         assertEquals(t2, foundTexture);
         foundTexture = Texture.findTexture("t1");
         assertEquals(t1, foundTexture);
+    }
+});
+
+TestCase("SceneNodeType test", {
+    "test SceneNodeType name": function() {
+        const sceneNodeType = SceneNodeType.deadTree;
+        assertEquals("deadTree.obj", sceneNodeType.sceneData._objFilename);
+    }
+});
+
+TestCase("SceneNodeC test", {
+    "test SceneNodeC name": function() {
+        const sceneNodeC = new SceneNodeC(SceneNodeType.sign);
+        assertEquals(0.2, sceneNodeC.getMuPersonal());
     }
 });
