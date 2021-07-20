@@ -350,6 +350,12 @@ var hasFinishedLoading=false;
  */
 const FIELD_RANGE = 40.0;
 
+/**
+ * If it is zero or one then the bird assumes a specific position, otherwise its position is determined randomly.
+ * @type {number}
+ */
+var birdPositionOrder=0;
+
 
 /**
  * Main function that defines the application "Birb hunt". First it prints the introductory text,
@@ -448,12 +454,21 @@ function autoResizeCanvas() {
  */
 function setBirdPosition() {
 	const positions = [[0.7, 0.5, 4.5], [-24, 0.5, 5], [-3, 0.5, 11], [27.3, 2.75, 32.2], [-30, 0.5, -32], [-2, 0.5, -21]];
-
-	const index = Math.floor(Math.random()*positions.length);
+	var index;
+	if(birdPositionOrder===0) {
+		birdPositionOrder=1;
+		index=0;
+	} else if(birdPositionOrder===1){
+		birdPositionOrder=2;
+		index=3;
+	} else {
+		index = Math.floor(Math.random()*positions.length);
+	}
+	console.log(index);
 
 	const position = positions[index];
 	const angle = Math.random()*360;
-	var localMatrix = utils.multiplyMatrices(utils.MakeTranslateMatrix(position[0], position[1], position[2]),
+	const localMatrix = utils.multiplyMatrices(utils.MakeTranslateMatrix(position[0], position[1], position[2]),
 		utils.MakeRotateYMatrix(angle));
 
 	birdNode.setPosition(position);
@@ -481,7 +496,6 @@ function createNodes() {
 	birdNode = new SceneNodeC(SceneNodeType.bird);
 	birdNode.setShadersType(ShadersType.pbr);
 	birdNode.setParent(rootNode);
-	setBirdPosition();
 	objectsWithCollision.push(birdNode);
 	generalObjectsToDraw.push(birdNode);
 	objectsWithShaders.push(birdNode);
