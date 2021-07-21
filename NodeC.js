@@ -275,7 +275,7 @@ const SceneNodeType = {"spruce": {id: 1, sceneData: new SceneData(new PBRDrawing
 			false), "rock3.obj",
 			"Texture_01",".jpg"), collisionObject: new ParallelepipedCollision(null,6.92/2, 5.2, 5.33/2)},
 	"smallrock": {id: 12, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
-			0.5,0.2, 0.5, false, true,
+			0.5,0.2, 0.5, false, false,
 			false), "smallrock.obj",
 			"Texture_01",".jpg"), collisionObject: new ParallelepipedCollision(null,1.64/2, 1.27, 1.34/2)},
 	"sign": {id: 13, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
