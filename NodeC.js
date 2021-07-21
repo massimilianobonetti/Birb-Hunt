@@ -55,76 +55,136 @@ class ObjData {
 /**
  * It contains the variables that are used to draw the objects. For example the vertex array object.
  */
-class Drawing {
+class EssentialDrawing {
 	/**
 	 * Vertex array object
 	 */
 	_vao = null;
 	/**
-	 * Number of indices of the object
+	 * Albedo texture of the object.
+	 */
+	_albedoTexture = null;
+	/**
+	 * Type of the shader
+	 * @type {{name: string, locations: null, id: number, program: null}}
+	 */
+	_shadersType = ShadersType.skyMap;
+	/**
+	 * Constructor of EssentialDrawing. It creates an object with the given type of shaders
+	 * @param shadersType type of the shaders
+	 */
+	constructor(shadersType) {
+		this._shadersType = shadersType;
+	}
+
+}
+
+/**
+ * It contains the variables that are used to draw the objects. For example the vertex array object.
+ */
+class LightDrawing extends EssentialDrawing {
+	/**
+	 * Number of indices of the object.
 	 * @type {number}
 	 */
 	_indicesLength = 0;
-
 	/**
-	 * It indicates the metalness of the object
-	 * @type {number}
+	 * Whether to use one texture for the normal vectors to the surface of the object.
+	 * @type {boolean}
 	 */
-	_muPersonal = 0.5;
+	_useNormalTexture = false;
+	/**
+	 * Texture that contains the encoding of the normal vectors.
+	 */
+	_normalTexture = null;
+	/**
+	 * Constructor of LightDrawing. It creates an object with the given attributes.
+	 * @param shadersType type of the shaders.
+	 * @param useNormalTexture whether to use the texture for the normal vectors.
+	 */
+	constructor(shadersType, useNormalTexture) {
+		super(shadersType);
+		this._useNormalTexture = useNormalTexture;
+	}
+
+}
+
+/**
+ * It contains the variables that are used to draw the objects. For example the vertex array object.
+ */
+class OrenNayarDrawing extends LightDrawing{
 	/**
 	 * It indicates the roughness of the object
 	 * @type {number}
 	 */
 	_alphaPersonal = 0.2;
 	/**
-	 * F0 value used if the PBR(Physically based rendering) is used
-	 * @type {number}
-	 */
-	_f0Personal = 0.5;
-
-	/**
 	 * Whether to use the textures for the metalness and the roughness of the object
 	 * @type {boolean}
 	 */
 	_useTexturesForMuAlpha = false;
-	/**
-	 * Whether to use the classic F0 formula of PBR or to use a personalized F0
-	 * @type {boolean}
-	 */
-	_useClassicF0Formula = false;
-	/**
-	 * Whether to use one texture for the normal vectors to the surface of the object
-	 * @type {boolean}
-	 */
-	_useNormalTexture = false;
-
-	/**
-	 * Type of the shader
-	 * @type {{name: string, locations: null, id: number, program: null}}
-	 */
-	_shadersType = ShadersType.pbr;
-
-	/**
-	 * Albedo texture of the object.
-	 */
-	_albedoTexture = null;
-	/**
-	 * Texture that contains the encoding of the normal vectors.
-	 */
-	_normalTexture = null;
-	/**
-	 * Texture that contains the encoding of the metalness.
-	 */
-	_muTexture = null;
 	/**
 	 * Texture that contains the encoding of the roughness.
 	 */
 	_alphaTexture = null;
 
 	/**
-	 * Constructor of Drawing. It creates an object with the default values as attributes
+	 * Constructor of OrenNayarDrawing. It creates an object with the given attributes
+	 * @param shadersType type of the shaders
+	 * @param alphaPersonal personalized roughness.
+	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
+	 * @param useNormalTexture whether to use the texture for the normal vectors.
 	 */
-	constructor() {
+	constructor(shadersType, alphaPersonal, useTexturesForMuAlpha, useNormalTexture) {
+		super(shadersType, useNormalTexture);
+		this._alphaPersonal = alphaPersonal;
+		this._useTexturesForMuAlpha = useTexturesForMuAlpha;
+		this._useNormalTexture = useNormalTexture;
+	}
+
+}
+
+/**
+ * It contains the variables that are used to draw the objects. For example the vertex array object.
+ */
+class PBRDrawing extends OrenNayarDrawing{
+	/**
+	 * It indicates the metalness of the object
+	 * @type {number}
+	 */
+	_muPersonal = 0.5;
+	/**
+	 * F0 value used if the PBR(Physically based rendering) is used
+	 * @type {number}
+	 */
+	_f0Personal = 0.5;
+	/**
+	 * Whether to use the classic F0 formula of PBR or to use a personalized F0
+	 * @type {boolean}
+	 */
+	_useClassicF0Formula = false;
+	/**
+	 * Texture that contains the encoding of the metalness.
+	 */
+	_muTexture = null;
+
+	/**
+	 * Constructor of PBRDrawing. It creates an object with the given attributes
+	 * @param shadersType type of the shaders
+	 * @param muPersonal personalized metalness.
+	 * @param alphaPersonal personalized roughness.
+	 * @param f0Personal personalized F0.
+	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
+	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering).
+	 * @param useNormalTexture whether to use the texture for the normal vectors.
+	 */
+	constructor(shadersType, muPersonal, alphaPersonal, f0Personal,
+				useTexturesForMuAlpha, useClassicF0Formula,
+				useNormalTexture) {
+		super(shadersType, alphaPersonal, useTexturesForMuAlpha, useNormalTexture);
+		this._muPersonal = muPersonal;
+		this._f0Personal = f0Personal;
+		this._useClassicF0Formula = useClassicF0Formula;
 	}
 
 }
@@ -142,9 +202,8 @@ class SceneData {
 	_objData = new ObjData();
 	/**
 	 * Drawing object, contains data used to draw the object, like the vertex array object
-	 * @type {Drawing}
 	 */
-	_drawing = new Drawing();
+	_drawing = null;
 	/**
 	 * Name of the texture to load and use
 	 */
@@ -162,18 +221,11 @@ class SceneData {
 	/**
 	 * Constructor of SceneData. It creates an object with the given attributes
 	 */
-	constructor(objFilename, muPersonal, alphaPersonal, f0Personal,
-				useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension,
-				useNormalTexture) {
+	constructor(drawing, objFilename, textureName, textureFileExtension) {
+		this._drawing = drawing;
 		this._objFilename = objFilename;
-		this._drawing._muPersonal = muPersonal;
-		this._drawing._alphaPersonal = alphaPersonal;
-		this._drawing._f0Personal = f0Personal;
-		this._drawing._useTexturesForMuAlpha = useTexturesForMuAlpha;
-		this._drawing._useClassicF0Formula = useClassicF0Formula;
 		this._textureName = textureName;
 		this._textureFileExtension = textureFileExtension;
-		this._drawing._useNormalTexture = useNormalTexture;
 	}
 }
 
@@ -181,64 +233,60 @@ class SceneData {
  * It represents the types of the objects in the scene. It contains one identifier,
  * one SceneData object and one Collision object.
  */
-const SceneNodeType = {"spruce": {id: 1, sceneData: new SceneData("spruceSmooth.obj",
-			0.5,0.2,0.5, false,
-			true, "Texture_01",".jpg",
-			false), collisionObject: new CylinderCollision(null,0.35, 4.38)},
-	"deadTree": {id: 2, sceneData: new SceneData("deadTree.obj",
-			0.5,0.2,0.5, false,
-			true, "Texture_01",".jpg",
-			false), collisionObject: new CylinderCollision(null,0.22, 4.41)},
-	"circularSpruce": {id: 3, sceneData: new SceneData("circularSpruce.obj",
-			0.5,0.2,0.5, false,
-			true, "Texture_01",".jpg",
-			false), collisionObject: new CylinderCollision(null,0.2, 4.38)},
-	"maritimePine": {id: 4, sceneData: new SceneData("maritimePine.obj",
-			0.5,0.2,0.5, false,
-			true, "Texture_01",".jpg",
-			false), collisionObject: new CylinderCollision(null,0.32, 2)},
-	"stump": {id: 5, sceneData: new SceneData("stump.obj",
-			0.5,0.2,0.5, false,
-			true, "Texture_01",".jpg",
-			false), collisionObject: new CylinderCollision(null,0.7, 0.896)},
-	"flower": {id: 6, sceneData: new SceneData("flower.obj",
-			0.5,0.2,0.5, false,
-			true, "Texture_01",".jpg",
-			false), collisionObject: new NoCollision()},
-	"plant": {id: 7, sceneData: new SceneData("plant.obj",
-			0.5,0.2,0.5, false,
-			true, "Texture_01",".jpg",
-			false), collisionObject: new NoCollision()},
-	"bird": {id: 8, sceneData: new SceneData("bird.obj",
-			0.5,0.2,0.5, false,
-			true, "texture_birb",".png",
-			false), collisionObject: new SphereCollision(null,0.5)},
-	"rock1": {id: 9, sceneData: new SceneData("rock1.obj",
-			0.5,0.2,0.5, false,
-			true, "Texture_01",".jpg",
-			false), collisionObject: new ParallelepipedCollision(null,5.47/2, 6.24, 4.65/2)},
-	"rock2": {id: 10, sceneData: new SceneData("rock2.obj",
-			0.5,0.2,0.5, false,
-			true, "Texture_01",".jpg",
-			false), collisionObject: new ParallelepipedCollision(null,4.67/2, 4.82, 4.25/2)},
-	"rock3": {id: 11, sceneData: new SceneData("rock3.obj",
-			0.5,0.2,0.5, false,
-			true, "Texture_01",".jpg",
-			false), collisionObject: new ParallelepipedCollision(null,6.92/2, 5.2, 5.33/2)},
-	"smallrock": {id: 12, sceneData: new SceneData("smallrock.obj",
-			0.5,0.2,0.8, false,
-			false, "Texture_01",".jpg",
-			false), collisionObject: new ParallelepipedCollision(null,1.64/2, 1.27, 1.34/2)},
-	"sign": {id: 13, sceneData: new SceneData("sign.obj",
-			0.2,0.1,0.5, false,
-			true, "sign",".png",
-			true), collisionObject: new ParallelepipedCollision(null,0.7/0.282/2, 1.1844/0.282, 0.2/0.282/2)},
-	"blades": {id: 14, sceneData: new SceneData("blades.obj",
-			1.0,1.0,0.5, true,
-			true, "sign",".png",
-			true), collisionObject: new ParallelepipedCollision(null,1/2, 0.8, 1/2)}
+const SceneNodeType = {"spruce": {id: 1, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			0.5,0.2, 0.5, false, true,
+			false), "spruceSmooth.obj",
+			"Texture_01",".jpg"), collisionObject: new CylinderCollision(null,0.35, 4.38)},
+	"deadTree": {id: 2, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			0.5,0.2, 0.5, false, true,
+			false), "deadTree.obj",
+			"Texture_01",".jpg"), collisionObject: new CylinderCollision(null,0.22, 4.41)},
+	"circularSpruce": {id: 3, sceneData: new SceneData(new LightDrawing(ShadersType.phong,
+			false), "circularSpruce.obj",
+			"Texture_01",".jpg"), collisionObject: new CylinderCollision(null,0.2, 4.38)},
+	"maritimePine": {id: 4, sceneData: new SceneData(new LightDrawing(ShadersType.blinn,
+			false), "maritimePine.obj",
+			"Texture_01",".jpg"), collisionObject: new CylinderCollision(null,0.32, 2)},
+	"stump": {id: 5, sceneData: new SceneData(new OrenNayarDrawing(ShadersType.orenNayar,
+			0.2,  false, false), "stump.obj",
+			"Texture_01",".jpg"), collisionObject: new CylinderCollision(null,0.7, 0.896)},
+	"flower": {id: 6, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			0.5,0.2, 0.5, false, true,
+			false), "flower.obj",
+			"Texture_01",".jpg"), collisionObject: new NoCollision()},
+	"plant": {id: 7, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			0.5,0.2, 0.5, false, true,
+			false), "plant.obj",
+			"Texture_01",".jpg"), collisionObject: new NoCollision()},
+	"bird": {id: 8, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			0.5,0.2, 0.5, false, true,
+			false), "bird.obj",
+			"texture_birb",".png"), collisionObject: new SphereCollision(null,0.5)},
+	"rock1": {id: 9, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			0.5,0.2, 0.5, false, true,
+			false), "rock1.obj",
+			"Texture_01",".jpg"), collisionObject: new ParallelepipedCollision(null,5.47/2, 6.24, 4.65/2)},
+	"rock2": {id: 10, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			0.5,0.2, 0.5, false, true,
+			false), "rock2.obj",
+			"Texture_01",".jpg"), collisionObject: new ParallelepipedCollision(null,4.67/2, 4.82, 4.25/2)},
+	"rock3": {id: 11, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			0.5,0.2, 0.5, false, true,
+			false), "rock3.obj",
+			"Texture_01",".jpg"), collisionObject: new ParallelepipedCollision(null,6.92/2, 5.2, 5.33/2)},
+	"smallrock": {id: 12, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			0.5,0.2, 0.5, false, true,
+			false), "smallrock.obj",
+			"Texture_01",".jpg"), collisionObject: new ParallelepipedCollision(null,1.64/2, 1.27, 1.34/2)},
+	"sign": {id: 13, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			0.2,0.1, 0.5, false, true,
+			true), "sign.obj",
+			"sign",".png"), collisionObject: new ParallelepipedCollision(null,0.7/0.282/2, 1.1844/0.282, 0.2/0.282/2)},
+	"blades": {id: 14, sceneData: new SceneData(new PBRDrawing(ShadersType.pbr,
+			1.0,1.0, 0.5, true, true,
+			true), "blades.obj",
+			"sign",".png"), collisionObject: new ParallelepipedCollision(null,1/2, 0.8, 1/2)}
 };
-
 
 /**
  * It contains the loaded textures
@@ -1410,11 +1458,6 @@ class NodeC extends BaseNodeC {
 
 
 
-
-
-
-
-
 	/**
 	 * It sets the VAO (Vertex Array Object) with the VBOs (Vertex buffer Objects) for the
 	 * vertices, the normal vectors, the indices and the uv coordinates. It sets the locations of the uniforms and it
@@ -1425,20 +1468,16 @@ class NodeC extends BaseNodeC {
 	 * @param uv uv coordinates of the object.
 	 * @param normals normal vectors of the object.
 	 * @param indices indices of the object.
-	 * @param muPersonal personalized metalness.
-	 * @param alphaPersonal personalized roughness.
-	 * @param f0Personal personalized F0.
 	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness.
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering).
 	 * @param textureName name of the textures.
 	 * @param textureFileExtension file extension of the textures.
 	 * @param useNormalTexture whether to use the texture for the normal vectors.
 	 */
-	static async createAndLoadDataForNode(node, vertices, uv, normals, indices, muPersonal, alphaPersonal,
-										  f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName,
+	static async createAndLoadDataForNode(node, vertices, uv, normals, indices,
+										  useTexturesForMuAlpha, textureName,
 										  textureFileExtension, useNormalTexture) {
 		NodeC.setVBAAndVBOs(node, vertices, uv, normals, indices);
-		NodeC.setUniforms(node, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, useNormalTexture);
+		NodeC.setUniforms(node);
 		await NodeC.setTextures(node, textureName, textureFileExtension, useTexturesForMuAlpha, useNormalTexture);
 	}
 
@@ -1507,14 +1546,8 @@ class NodeC extends BaseNodeC {
 	 * Phong and Blinn the metalness and the roughness, while the Oren-Nayar uses in addition the roughness
 	 * These setting are done only if the corresponding variables were not set up before.
 	 * @param node node of which the variables are set.
-	 * @param muPersonal personalized metalness.
-	 * @param alphaPersonal personalized roughness.
-	 * @param f0Personal personalized F0.
-	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR (Physically based rendering).
-	 * @param useNormalTexture whether to use the texture for the normal vectors.
 	 */
-	static setUniforms(node, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, useNormalTexture) {
+	static setUniforms(node) {
 		if(node.getWvpMatrixLocation()==null) {
 			node.setWvpMatrixLocation(gl.getUniformLocation(node.getProgram(), "wvpMatrix"));
 			node.setNormalMatrixLocation(gl.getUniformLocation(node.getProgram(), "normalMatrix"));
@@ -1549,28 +1582,20 @@ class NodeC extends BaseNodeC {
 				node.setMuPersonalLoc(gl.getUniformLocation(node.getProgram(), "muPersonal"));
 				node.setAlphaPersonalLoc(gl.getUniformLocation(node.getProgram(), "alphaPersonal"));
 				node.setF0PersonalLoc(gl.getUniformLocation(node.getProgram(), "f0Personal"));
-				node.setMuPersonal(muPersonal);
-				node.setAlphaPersonal(alphaPersonal);
-				node.setF0Personal(f0Personal);
 				node.setUseTexturesForMuAlphaLoc(gl.getUniformLocation(node.getProgram(), "useTexturesForMuAlpha"));
 				node.setUseClassicF0FormulaLoc(gl.getUniformLocation(node.getProgram(), "useClassicF0Formula"));
-				node.setUseTexturesForMuAlpha(useTexturesForMuAlpha);
-				node.setUseClassicF0Formula(useClassicF0Formula);
 				node.setMuTextureLoc(gl.getUniformLocation(node.getProgram(), "muTexture"));
 				node.setAlphaTextureLoc(gl.getUniformLocation(node.getProgram(), "alphaTexture"));
 
 			} else if (node.getShadersType().id === ShadersType.orenNayar.id) {
 				node.setAlphaPersonalLoc(gl.getUniformLocation(node.getProgram(), "alphaPersonal"));
-				node.setAlphaPersonal(alphaPersonal);
 				node.setUseTexturesForMuAlphaLoc(gl.getUniformLocation(node.getProgram(), "useTexturesForMuAlpha"));
-				node.setUseTexturesForMuAlpha(useTexturesForMuAlpha);
 				node.setMuTextureLoc(gl.getUniformLocation(node.getProgram(), "muTexture"));
 				node.setAlphaTextureLoc(gl.getUniformLocation(node.getProgram(), "alphaTexture"));
 			}
 
 
 			node.setUseNormalTextureLoc(gl.getUniformLocation(node.getProgram(), "useNormalTexture"));
-			node.setUseNormalTexture(useNormalTexture);
 		}
 	}
 
@@ -1670,15 +1695,15 @@ class NodeC extends BaseNodeC {
 class GenericNodeC extends NodeC {
 	/**
 	 * Drawing object.
-	 * @type {Drawing}
 	 */
-	_drawing = new Drawing();
+	_drawing = null;
 
 	/**
 	 * Constructor of GenericNodeC. It creates an object with the default values as attributes
 	 */
-	constructor() {
+	constructor(drawing) {
 		super();
+		this._drawing = drawing;
 	}
 
 	/**
@@ -2546,8 +2571,8 @@ class SceneNodeC extends NodeC {
 		node.setLocalMatrix(localMatrix);
 
 		await NodeC.createAndLoadDataForNode(node, classType._objData._vertices, classType._objData._uv,
-			classType._objData._normals, classType._objData._indices, muPersonal, alphaPersonal, f0Personal,
-			useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
+			classType._objData._normals, classType._objData._indices,
+			useTexturesForMuAlpha, textureName, textureFileExtension, useNormalTexture);
 	}
 
 	/**

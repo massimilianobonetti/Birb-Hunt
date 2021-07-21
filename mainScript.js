@@ -481,13 +481,14 @@ function setBirdPosition() {
 function createNodes() {
 	rootNode = new BaseNodeC();
 
-	fieldNode = new GenericNodeC();
-	fieldNode.setShadersType(ShadersType.pbr);
+	fieldNode = new GenericNodeC(new PBRDrawing(ShadersType.pbr,
+		0.55, 0.3, 0.5, false, true,
+		true));
 	fieldNode.setParent(rootNode);
 	objectsWithShaders.push(fieldNode);
 	objectsWithCollision.push(fieldNode);
 
-	skyMapNode = new GenericNodeC();
+	skyMapNode = new GenericNodeC(new EssentialDrawing(ShadersType.skyMap));
 	skyMapNode.setShadersType(ShadersType.skyMap);
 	skyMapNode.setParent(rootNode);
 	objectsWithShaders.push(skyMapNode);
@@ -648,8 +649,7 @@ function createNodes() {
  * @param shaderType type of the shaders of the node
  * @returns the created node
  */
-function setNode(node, position, shaderType) {
-	node.setShadersType(shaderType);
+function setNode(node, position) {
 	node.setParent(rootNode);
 	node.setPosition(position);
 
@@ -665,7 +665,7 @@ function setNode(node, position, shaderType) {
  * @param position position of the node
  */
 function createSpruceNode(position) {
-	setNode(new SceneNodeC(SceneNodeType.spruce), position, ShadersType.pbr);
+	setNode(new SceneNodeC(SceneNodeType.spruce), position);
 }
 
 /**
@@ -953,7 +953,7 @@ async function createField() {
 	fieldNode.setCollisionObject(new ParallelepipedCollision([0, -COLLISION_HEIGHT, 0], FIELD_RANGE, COLLISION_HEIGHT, FIELD_RANGE));
 	
 	await NodeC.createAndLoadDataForNode(fieldNode, vertices, uv, normals, indices,
-		0.55, 0.3, 0.5, false, true, "stylized-grass1", ".png", true);
+		fieldNode.getUseTexturesForMuAlpha(), "stylized-grass1", ".png", fieldNode.getUseNormalTexture());
 }
 
 
