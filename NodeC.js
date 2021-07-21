@@ -6,12 +6,12 @@
  * one shader used to draw the life indicator of the player.
  * Each type contains one identifier, one name and one program.
  */
-const ShadersType = {"pbr": {id: 1, name: "pbrTex", program: null, locations: null},
-	"phong": {id: 2, name: "phong", program: null, locations: null},
-	"blinn": {id: 3, name: "blinn", program: null, locations: null},
-	"orenNayar": {id: 4, name: "orenNayar", program: null, locations: null},
-	"skyMap": {id: 5, name: "skyMap", program: null, locations: null},
-	"life": {id: 6, name: "life", program: null, locations: null}};
+const ShadersType = {"pbr": {id: 1, name: "pbrTex", program: null, locations: null, createLocations() {ShadersType.pbr.locations=new PBRLocations();}},
+	"phong": {id: 2, name: "phong", program: null, locations: null, createLocations() {ShadersType.phong.locations=new LightAndDrawLocations();}},
+	"blinn": {id: 3, name: "blinn", program: null, locations: null, createLocations() {ShadersType.blinn.locations=new LightAndDrawLocations();}},
+	"orenNayar": {id: 4, name: "orenNayar", program: null, locations: null, createLocations() {ShadersType.orenNayar.locations=new OrenNayarLocations();}},
+	"skyMap": {id: 5, name: "skyMap", program: null, locations: null, createLocations() {ShadersType.skyMap.locations=new EssentialLocations();}},
+	"life": {id: 6, name: "life", program: null, locations: null, createLocations() {ShadersType.life.locations=new IndicatorLocations();}}};
 Object.freeze(ShadersType);
 
 /**
@@ -281,9 +281,34 @@ class Texture {
 }
 
 /**
- * It contains the locations of the uniforms in the memory
+ * It contains just a few locations of the uniforms in the memory for the shaders
  */
-class Locations {
+class EssentialLocations {
+	/**
+	 * Location of the uniform invViewProjMatrix
+	 */
+	_invViewProjMatrixLoc = null;
+	/**
+	 * Location of the uniform albedoTexture
+	 */
+	_albedoTextureLoc = null;
+	/**
+	 * Location of the uniform isNight
+	 */
+	_isNightLoc = null;
+
+	/**
+	 * Constructor of SkyMapLocations. It creates an object with the default values as attributes
+	 */
+	constructor() {
+	}
+}
+
+/**
+ * It contains the locations of the uniforms in the memory for the shaders that manage the light and
+ * need to draw objects
+ */
+class LightAndDrawLocations extends EssentialLocations {
 	/**
 	 * Location of the uniform wvpMatrix
 	 */
@@ -308,36 +333,12 @@ class Locations {
 	 * Location of the uniform wvMatrix
 	 */
 	_wvMatrixLocation = null;
-	/**
-	 * Location of the uniform mu
-	 */
-	_muLocation = null;
-	/**
-	 * Location of the uniform alpha
-	 */
-	_alphaLocation = null;
-	/**
-	 * Location of the uniform invViewProjMatrix
-	 */
-	_invViewProjMatrixLoc = null;
 
 
-	/**
-	 * Location of the uniform albedoTexture
-	 */
-	_albedoTextureLoc = null;
 	/**
 	 * Location of the uniform normalTexture
 	 */
 	_normalTextureLoc = null;
-	/**
-	 * Location of the uniform muTexture
-	 */
-	_muTextureLoc = null;
-	/**
-	 * Location of the uniform alphaTexture
-	 */
-	_alphaTextureLoc = null;
 	/**
 	 * Location of the uniform hemiLightUpper
 	 */
@@ -352,31 +353,9 @@ class Locations {
 	_hemisphericDLoc = null;
 
 	/**
-	 * Location of the uniform muPersonal
-	 */
-	_muPersonalLoc = null;
-	/**
-	 * Location of the uniform alphaPersonal
-	 */
-	_alphaPersonalLoc = null;
-	/**
-	 * Location of the uniform f0Personal
-	 */
-	_f0PersonalLoc = null;
-	/**
-	 * Location of the uniform useTexturesForMuAlpha
-	 */
-	_useTexturesForMuAlphaLoc = null;
-	/**
-	 * Location of the uniform useClassicF0Formula
-	 */
-	_useClassicF0FormulaLoc = null;
-	/**
 	 * Location of the uniform useNormalTexture
 	 */
 	_useNormalTextureLoc = null;
-
-
 
 	/**
 	 * Location of the uniform pl1Color
@@ -430,10 +409,110 @@ class Locations {
 	 * Location of the uniform spotDirection
 	 */
 	_spotDirectionLoc = null;
+
 	/**
-	 * Location of the uniform isNight
+	 * Constructor of Locations. It creates an object with the default values as attributes
 	 */
-	_isNightLoc = null;
+	constructor() {
+		super();
+	}
+}
+
+/**
+ * It contains the locations of the uniforms in the memory for the shader pbr
+ */
+class OrenNayarLocations extends LightAndDrawLocations{
+	/**
+	 * Location of the uniform alpha
+	 */
+	_alphaLocation = null;
+
+	/**
+	 * Location of the uniform alphaTexture
+	 */
+	_alphaTextureLoc = null;
+
+	/**
+	 * Location of the uniform alphaPersonal
+	 */
+	_alphaPersonalLoc = null;
+
+	/**
+	 * Location of the uniform useTexturesForMuAlpha
+	 */
+	_useTexturesForMuAlphaLoc = null;
+
+	/**
+	 * Constructor of Locations. It creates an object with the default values as attributes
+	 */
+	constructor() {
+		super();
+	}
+}
+
+/**
+ * It contains the locations of the uniforms in the memory for the shader orenNayar
+ * shader
+ */
+class PBRLocations extends OrenNayarLocations {
+	/**
+	 * Location of the uniform muTexture
+	 */
+	_muTextureLoc = null;
+
+	/**
+	 * Location of the uniform muPersonal
+	 */
+	_muPersonalLoc = null;
+	/**
+	 * Location of the uniform f0Personal
+	 */
+	_f0PersonalLoc = null;
+	/**
+	 * Location of the uniform useClassicF0Formula
+	 */
+	_useClassicF0FormulaLoc = null;
+
+	/**
+	 * Constructor of Locations. It creates an object with the default values as attributes
+	 */
+	constructor() {
+		super();
+	}
+}
+
+/**
+ * It contains the locations of the uniforms in the memory for the shaders that represent an indicator
+ * in the graphical user interface
+ */
+class IndicatorLocations {
+	/**
+	 * Location of the uniform life
+	 * @private
+	 */
+	_lifeUniformLoc=null;
+	/**
+	 * Location of the uniform canvasWidthLoc
+	 * @private
+	 */
+	_canvasWidthLoc = null;
+	/**
+	 * Location of the uniform canvasHeightLoc
+	 * @private
+	 */
+	_canvasHeightLoc = null;
+
+	/**
+	 * Location of the uniform startXLoc
+	 * @private
+	 */
+	_startXLoc = null;
+
+	/**
+	 * Location of the uniform widthLoc
+	 * @private
+	 */
+	_widthLoc = null;
 
 	/**
 	 * Constructor of Locations. It creates an object with the default values as attributes
@@ -441,7 +520,6 @@ class Locations {
 	constructor() {
 	}
 }
-
 
 
 /**
@@ -761,20 +839,6 @@ class NodeC extends BaseNodeC {
 	 * @param wvMatrixLocation new wvMatrixLocation
 	 */
 	setWvMatrixLocation(wvMatrixLocation) {
-	}
-
-	/**
-	 * It returns the muLocation
-	 * @returns muLocation
-	 */
-	getMuLocation() {
-	}
-
-	/**
-	 * It sets the muLocation with the given one
-	 * @param muLocation new muLocation
-	 */
-	setMuLocation(muLocation) {
 	}
 
 	/**
@@ -1370,9 +1434,9 @@ class NodeC extends BaseNodeC {
 	 * @param textureFileExtension file extension of the textures.
 	 * @param useNormalTexture whether to use the texture for the normal vectors.
 	 */
-	static async createAndloadDataOnGPUForNode(node, vertices, uv, normals, indices, muPersonal, alphaPersonal,
-											   f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName,
-											   textureFileExtension, useNormalTexture) {
+	static async createAndLoadDataForNode(node, vertices, uv, normals, indices, muPersonal, alphaPersonal,
+										  f0Personal, useTexturesForMuAlpha, useClassicF0Formula, textureName,
+										  textureFileExtension, useNormalTexture) {
 		NodeC.setVBAAndVBOs(node, vertices, uv, normals, indices);
 		NodeC.setUniforms(node, muPersonal, alphaPersonal, f0Personal, useTexturesForMuAlpha, useClassicF0Formula, useNormalTexture);
 		await NodeC.setTextures(node, textureName, textureFileExtension, useTexturesForMuAlpha, useNormalTexture);
@@ -1465,8 +1529,6 @@ class NodeC extends BaseNodeC {
 
 			node.setAlbedoTextureLoc(gl.getUniformLocation(node.getProgram(), "albedoTexture"));
 			node.setNormalTextureLoc(gl.getUniformLocation(node.getProgram(), "normalTexture"));
-			node.setMuTextureLoc(gl.getUniformLocation(node.getProgram(), "muTexture"));
-			node.setAlphaTextureLoc(gl.getUniformLocation(node.getProgram(), "alphaTexture"));
 
 			node.setPl1ColorLoc(gl.getUniformLocation(node.getProgram(), "pl1Color"));
 			node.setPl1PosLoc(gl.getUniformLocation(node.getProgram(), "pl1Pos"));
@@ -1494,12 +1556,16 @@ class NodeC extends BaseNodeC {
 				node.setUseClassicF0FormulaLoc(gl.getUniformLocation(node.getProgram(), "useClassicF0Formula"));
 				node.setUseTexturesForMuAlpha(useTexturesForMuAlpha);
 				node.setUseClassicF0Formula(useClassicF0Formula);
+				node.setMuTextureLoc(gl.getUniformLocation(node.getProgram(), "muTexture"));
+				node.setAlphaTextureLoc(gl.getUniformLocation(node.getProgram(), "alphaTexture"));
 
 			} else if (node.getShadersType().id === ShadersType.orenNayar.id) {
 				node.setAlphaPersonalLoc(gl.getUniformLocation(node.getProgram(), "alphaPersonal"));
 				node.setAlphaPersonal(alphaPersonal);
 				node.setUseTexturesForMuAlphaLoc(gl.getUniformLocation(node.getProgram(), "useTexturesForMuAlpha"));
 				node.setUseTexturesForMuAlpha(useTexturesForMuAlpha);
+				node.setMuTextureLoc(gl.getUniformLocation(node.getProgram(), "muTexture"));
+				node.setAlphaTextureLoc(gl.getUniformLocation(node.getProgram(), "alphaTexture"));
 			}
 
 
@@ -1809,22 +1875,6 @@ class GenericNodeC extends NodeC {
 	 */
 	setWvMatrixLocation(wvMatrixLocation) {
 		this.getShadersType().locations._wvMatrixLocation = wvMatrixLocation;
-	}
-
-	/**
-	 * It returns the muLocation
-	 * @returns muLocation
-	 */
-	getMuLocation() {
-		return this.getShadersType().locations._muLocation;
-	}
-
-	/**
-	 * It sets the muLocation with the given one
-	 * @param muLocation new muLocation
-	 */
-	setMuLocation(muLocation) {
-		this.getShadersType().locations._muLocation = muLocation;
 	}
 
 	/**
@@ -2495,7 +2545,7 @@ class SceneNodeC extends NodeC {
 
 		node.setLocalMatrix(localMatrix);
 
-		await NodeC.createAndloadDataOnGPUForNode(node, classType._objData._vertices, classType._objData._uv,
+		await NodeC.createAndLoadDataForNode(node, classType._objData._vertices, classType._objData._uv,
 			classType._objData._normals, classType._objData._indices, muPersonal, alphaPersonal, f0Personal,
 			useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension, useNormalTexture);
 	}
@@ -2641,22 +2691,6 @@ class SceneNodeC extends NodeC {
 	 */
 	setWvMatrixLocation(wvMatrixLocation) {
 		this.getShadersType().locations._wvMatrixLocation = wvMatrixLocation;
-	}
-
-	/**
-	 * It returns the muLocation
-	 * @returns muLocation
-	 */
-	getMuLocation() {
-		return this.getShadersType().locations._drawing._muLocation;
-	}
-
-	/**
-	 * It sets the muLocation with the given one
-	 * @param muLocation new muLocation
-	 */
-	setMuLocation(muLocation) {
-		this.getShadersType().locations._muLocation = muLocation;
 	}
 
 	/**

@@ -14,11 +14,7 @@ class Life {
      * @private
      */
     _indicesLength=0;
-    /**
-     * Location of the uniform life
-     * @private
-     */
-    _lifeUniformLoc=null;
+
     /**
      * Type of the shader
      * @type {ShadersType}
@@ -30,28 +26,8 @@ class Life {
      * @private
      */
     _life = 100;
-    /**
-     * Location of the uniform canvasWidthLoc
-     * @private
-     */
-    _canvasWidthLoc = null;
-    /**
-     * Location of the uniform canvasHeightLoc
-     * @private
-     */
-    _canvasHeightLoc = null;
 
-    /**
-     * Location of the uniform startXLoc
-     * @private
-     */
-    _startXLoc = null;
 
-    /**
-     * Location of the uniform widthLoc
-     * @private
-     */
-    _widthLoc = null;
 
     /**
      * Constructor of Life. It creates an object with the default values as attributes
@@ -105,7 +81,7 @@ class Life {
      * @returns lifeUniformLoc
      */
     getLifeUniformLoc() {
-        return this._lifeUniformLoc;
+        return this.getShadersType().locations._lifeUniformLoc;
     }
 
     /**
@@ -113,7 +89,7 @@ class Life {
      * @param lifeUniformLoc new lifeUniformLoc
      */
     setLifeUniformLoc(lifeUniformLoc) {
-        this._lifeUniformLoc = lifeUniformLoc;
+        this.getShadersType().locations._lifeUniformLoc = lifeUniformLoc;
     }
 
     /**
@@ -153,7 +129,7 @@ class Life {
      * @returns canvasWidthLoc
      */
     getCanvasWidthLoc() {
-        return this._canvasWidthLoc;
+        return this.getShadersType().locations._canvasWidthLoc;
     }
 
     /**
@@ -161,7 +137,7 @@ class Life {
      * @param canvasWidthLoc new canvasWidthLoc
      */
     setCanvasWidthLoc(canvasWidthLoc) {
-        this._canvasWidthLoc = canvasWidthLoc;
+        this.getShadersType().locations._canvasWidthLoc = canvasWidthLoc;
     }
 
     /**
@@ -169,7 +145,7 @@ class Life {
      * @returns canvasHeightLoc
      */
     getCanvasHeightLoc() {
-        return this._canvasHeightLoc;
+        return this.getShadersType().locations._canvasHeightLoc;
     }
 
     /**
@@ -177,7 +153,7 @@ class Life {
      * @param canvasHeightLoc new canvasHeightLoc
      */
     setCanvasHeightLoc(canvasHeightLoc) {
-        this._canvasHeightLoc = canvasHeightLoc;
+        this.getShadersType().locations._canvasHeightLoc = canvasHeightLoc;
     }
 
     /**
@@ -185,7 +161,7 @@ class Life {
      * @returns startXLoc
      */
     getStartXLoc() {
-        return this._startXLoc;
+        return this.getShadersType().locations._startXLoc;
     }
 
     /**
@@ -193,7 +169,7 @@ class Life {
      * @param startXLoc new startXLoc
      */
     setStartXLoc(startXLoc) {
-        this._startXLoc = startXLoc;
+        this.getShadersType().locations._startXLoc = startXLoc;
     }
 
 
@@ -203,7 +179,7 @@ class Life {
      * @returns widthLoc
      */
     getWidthLoc() {
-        return this._widthLoc;
+        return this.getShadersType().locations._widthLoc;
     }
 
     /**
@@ -211,6 +187,6 @@ class Life {
      * @param widthLoc new widthLoc
      */
     setWidthLoc(widthLoc) {
-        this._widthLoc = widthLoc;
+        this.getShadersType().locations._widthLoc = widthLoc;
     }
 }

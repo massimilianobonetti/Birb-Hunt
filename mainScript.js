@@ -464,7 +464,6 @@ function setBirdPosition() {
 	} else {
 		index = Math.floor(Math.random()*positions.length);
 	}
-	console.log(index);
 
 	const position = positions[index];
 	const angle = Math.random()*360;
@@ -799,7 +798,7 @@ async function initializePrograms() {
 				var fragmentShader = utils.createShader(gl, gl.FRAGMENT_SHADER, shaderText[1]);
 
 				object.getShadersType().program = utils.createProgram(gl, vertexShader, fragmentShader);
-				object.getShadersType().locations = new Locations();
+				object.getShadersType().createLocations();
 			});
 		}
 	}
@@ -953,7 +952,7 @@ async function createField() {
 	const COLLISION_HEIGHT = 1;
 	fieldNode.setCollisionObject(new ParallelepipedCollision([0, -COLLISION_HEIGHT, 0], FIELD_RANGE, COLLISION_HEIGHT, FIELD_RANGE));
 	
-	await NodeC.createAndloadDataOnGPUForNode(fieldNode, vertices, uv, normals, indices,
+	await NodeC.createAndLoadDataForNode(fieldNode, vertices, uv, normals, indices,
 		0.55, 0.3, 0.5, false, true, "stylized-grass1", ".png", true);
 }
 
