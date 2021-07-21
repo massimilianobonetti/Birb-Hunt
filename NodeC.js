@@ -53,7 +53,7 @@ class ObjData {
 }
 
 /**
- * It contains the variables that are used to draw the objects. For example the vertex array object.
+ * It contains the variables that are used to draw the objects with the shader skyMap
  */
 class EssentialDrawing {
 	/**
@@ -80,7 +80,7 @@ class EssentialDrawing {
 }
 
 /**
- * It contains the variables that are used to draw the objects. For example the vertex array object.
+ * It contains the variables that are used to draw the objects with the shader phong or blinn
  */
 class LightDrawing extends EssentialDrawing {
 	/**
@@ -110,7 +110,7 @@ class LightDrawing extends EssentialDrawing {
 }
 
 /**
- * It contains the variables that are used to draw the objects. For example the vertex array object.
+ * It contains the variables that are used to draw the objects with the shader orenNayar
  */
 class OrenNayarDrawing extends LightDrawing{
 	/**
@@ -145,7 +145,7 @@ class OrenNayarDrawing extends LightDrawing{
 }
 
 /**
- * It contains the variables that are used to draw the objects. For example the vertex array object.
+ * It contains the variables that are used to draw the objects with the shader pbr
  */
 class PBRDrawing extends OrenNayarDrawing{
 	/**
@@ -1542,8 +1542,8 @@ class NodeC extends BaseNodeC {
 	}
 
 	/**
-	 * It sets the locations of the uniforms depending on the type of the shaders. PBR uses in addition with respecto to
-	 * Phong and Blinn the metalness and the roughness, while the Oren-Nayar uses in addition the roughness
+	 * It sets the locations of the uniforms depending on the type of the shaders. PBR uses in addition with respect to
+	 * Phong and Blinn the metalness and the roughness, while the Oren-Nayar uses in addition the roughness.
 	 * These setting are done only if the corresponding variables were not set up before.
 	 * @param node node of which the variables are set.
 	 */
@@ -1694,7 +1694,7 @@ class NodeC extends BaseNodeC {
  */
 class GenericNodeC extends NodeC {
 	/**
-	 * Drawing object.
+	 * Drawing object, contains data used to draw the object, like the vertex array object
 	 */
 	_drawing = null;
 
@@ -2530,9 +2530,8 @@ class SceneNodeC extends NodeC {
 		localMatrix = utils.multiplyMatrices(utils.MakeTranslateMatrix(this._position[0], this._position[1], this._position[2]), localMatrix);
 
 		await this.loadNodeFromObjFile(this._sceneNodeType.sceneData._objFilename, this, localMatrix,
-			this._sceneNodeType.sceneData._drawing._muPersonal, this._sceneNodeType.sceneData._drawing._alphaPersonal,
-			this._sceneNodeType.sceneData._drawing._f0Personal, this._sceneNodeType.sceneData._drawing._useTexturesForMuAlpha,
-			this._sceneNodeType.sceneData._drawing._useClassicF0Formula, this._sceneNodeType.sceneData._textureName,
+			this._sceneNodeType.sceneData._drawing._useTexturesForMuAlpha,
+			this._sceneNodeType.sceneData._textureName,
 			this._sceneNodeType.sceneData._textureFileExtension, this._sceneNodeType.sceneData._drawing._useNormalTexture);
 	}
 
@@ -2545,18 +2544,13 @@ class SceneNodeC extends NodeC {
 	 * @param objFilename name of the obj file
 	 * @param node node of which the variables are set
 	 * @param localMatrix local matrix
-	 * @param muPersonal personalized metalness
-	 * @param alphaPersonal personalized roughness
-	 * @param f0Personal personalized F0
 	 * @param useTexturesForMuAlpha whether to use the textures for the metalness and the roughness
-	 * @param useClassicF0Formula whether to use the classic formula to calculate the F0 in PBR
-	 * (Physically based rendering)
 	 * @param textureName name of the textures
 	 * @param textureFileExtension extension of the textures
 	 * @param useNormalTexture whether to use the texture for the normal vectors
 	 */
-	async loadNodeFromObjFile(objFilename, node, localMatrix, muPersonal, alphaPersonal, f0Personal,
-							  useTexturesForMuAlpha, useClassicF0Formula, textureName, textureFileExtension,
+	async loadNodeFromObjFile(objFilename, node, localMatrix,
+							  useTexturesForMuAlpha, textureName, textureFileExtension,
 							  useNormalTexture) {
 		const classType = this._sceneNodeType.sceneData;
 		if(classType._objData._vertices==null) {
